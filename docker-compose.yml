@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./scoreboard-backend
+    image: scoreboard-backend:latest
+    container_name: scoreboard-backend
+    restart: unless-stopped
+    expose:
+      - "8080"
+    networks:
+      - scoreboard-net
+
+  frontend:
+    build:
+      context: ./scoreboard-frontend
+    image: scoreboard-frontend:latest
+    container_name: basketball-frontend
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - scoreboard-net
+
+  nginx:
+    image: docker.io/library/nginx:alpine
+    container_name: scoreboard-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - scoreboard-net
+
+networks:
+  scoreboard-net:
+    driver: bridge

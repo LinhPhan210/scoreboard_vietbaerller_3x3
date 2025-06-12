@@ -1,0 +1,201 @@
+.controllerContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #121212;
+  color: white;
+  padding: 20px;
+}
+
+.pageTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.timerDisplaySection {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+}
+
+.timerDisplay, .shotClockDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 200px;
+}
+
+.timerValue {
+  font-size: 8rem; /* Increased size for scoreboard */
+  font-weight: bold;
+  color: #FFD700; /* Gold color for timer */
+}
+
+.shotClockValue {
+  font-size: 12rem; /* Increased size for scoreboard */
+  font-weight: bold;
+  color: #FF4136; /* Red color for shot clock */
+}
+
+.timerStatus, .shotClockStatus {
+  margin-top: 10px;
+  font-size: 1.2rem;
+}
+
+.running {
+  color: #4CAF50; /* Green */
+}
+
+.stopped {
+  color: #F44336; /* Red */
+}
+
+.controlSection {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.timerControls, .shotClockControls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  width: 45%;
+}
+
+.timerControls h2, .shotClockControls h2 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+
+.buttonGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 15px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.buttonGrid button:first-child {
+  grid-column: 1 / span 2;
+}
+
+.controlButton {
+  padding: 15px 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.controlButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.controlButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.controlButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.startButton {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+
+.stopButton {
+  background-color: #F44336; /* Red */
+  color: white;
+}
+
+.resetButton {
+  background-color: #FF9800; /* Orange */
+  color: white;
+}
+
+.setButton {
+  background-color: #2196F3; /* Blue */
+  color: white;
+}
+
+.customTimeSection {
+  display: flex;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.timeInput {
+  flex: 1;
+  padding: 12px 15px;
+  font-size: 1.2rem;
+  border: 2px solid #333;
+  border-radius: 8px 0 0 8px;
+  background-color: #333;
+  color: white;
+}
+
+.timeInput:focus {
+  outline: none;
+  border-color: #2196F3;
+}
+
+.customTimeSection .setButton {
+  border-radius: 0 8px 8px 0;
+  flex: 0.8;
+}
+
+.connectionStatus {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1rem;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background-color: #1e1e1e;
+}
+
+.connected {
+  color: #4CAF50;
+}
+
+.disconnected {
+  color: #F44336;
+}
+
+.tabSwitcher {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  display: flex;
+  gap: 16px;
+  z-index: 10;
+}
+
+.tabSwitcher a {
+  color: #FFD700;
+  background: #222;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.tabSwitcher a:hover {
+  background: #FFD700;
+  color: #222;
+}

@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  scoreboard-backend:
+    build: .
+    container_name: scoreboard-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - GIN_MODE=release
+      - PORT=8080
+    restart: unless-stopped

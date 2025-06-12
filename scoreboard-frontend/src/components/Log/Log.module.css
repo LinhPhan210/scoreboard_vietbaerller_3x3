@@ -1,0 +1,119 @@
+.logContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #121212;
+  color: white;
+  padding: 20px;
+  position: relative;
+}
+
+.tabSwitcher {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  display: flex;
+  gap: 16px;
+  z-index: 10;
+}
+
+.tabSwitcher a {
+  color: #FFD700;
+  background: #222;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.tabSwitcher a:hover {
+  background: #FFD700;
+  color: #222;
+}
+
+.pageTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.logContent {
+  background: #181818;
+  color: #FFD700;
+  padding: 20px;
+  border-radius: 10px;
+  font-family: monospace;
+  font-size: 1.1rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  margin-top: 20px;
+}
+
+.logTime {
+  color: #888;
+  margin-right: 16px;
+}
+.logType {
+  color: #FFD700;
+  font-weight: bold;
+  margin-right: 10px;
+}
+.logAction {
+  color: #fff;
+  margin-right: 10px;
+}
+.logValue {
+  color: #FFD700;
+  font-weight: bold;
+}
+
+.foulWarning {
+  color: #FFD700 !important;
+  background: rgba(255,215,0,0.15);
+  border-radius: 10px;
+}
+.foulDanger {
+  color: #FF4136 !important;
+  background: rgba(255,65,54,0.15);
+  border-radius: 10px;
+}
+.scoreUp {
+  color: #4CAF50 !important;
+}
+.scoreDown {
+  color: #F44336 !important;
+}
+
+.error {
+  color: #FF4136;
+  margin: 20px 0;
+}
+
+.logList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: #181818;
+  color: #FFD700;
+  border-radius: 10px;
+  font-family: monospace;
+  font-size: 1.1rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  margin-top: 20px;
+}
+
+.logList li {
+  padding: 8px 16px;
+  border-bottom: 1px solid #222;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logList li:last-child {
+  border-bottom: none;
+}

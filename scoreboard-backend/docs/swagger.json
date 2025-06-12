@@ -1,0 +1,421 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/foulA/decrement": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "foul"
+                ],
+                "summary": "Decrement Team A foul",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/foulA/increment": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "foul"
+                ],
+                "summary": "Increment Team A foul",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/foulB/decrement": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "foul"
+                ],
+                "summary": "Decrement Team B foul",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/foulB/increment": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "foul"
+                ],
+                "summary": "Increment Team B foul",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/game/reset": {
+            "post": {
+                "description": "Resets timer, shot clock, and both team scores to default values",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "game"
+                ],
+                "summary": "Reset the game",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/log": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "log"
+                ],
+                "summary": "Get change log",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/scoreA/decrement": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "score"
+                ],
+                "summary": "Decrement Team A score",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/scoreA/increment": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "score"
+                ],
+                "summary": "Increment Team A score",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/scoreB/decrement": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "score"
+                ],
+                "summary": "Decrement Team B score",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/scoreB/increment": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "score"
+                ],
+                "summary": "Increment Team B score",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/shotclock/reset": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shotclock"
+                ],
+                "summary": "Reset the shot clock",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/shotclock/set": {
+            "post": {
+                "description": "Sets the shot clock to a specific value in ss.x format",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shotclock"
+                ],
+                "summary": "Set the shot clock",
+                "parameters": [
+                    {
+                        "description": "Shot clock in ss.x format",
+                        "name": "shotclock",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SetShotClockRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/shotclock/start": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shotclock"
+                ],
+                "summary": "Start the shot clock",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/shotclock/stop": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shotclock"
+                ],
+                "summary": "Stop the shot clock",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/state": {
+            "get": {
+                "description": "Returns the current state of the scoreboard, including timer, scores, and shot clock",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "state"
+                ],
+                "summary": "Get current scoreboard state",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/state/sync": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "state"
+                ],
+                "summary": "Trigger state_sync WebSocket broadcast",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/timer/reset": {
+            "post": {
+                "description": "Resets the main timer to 10:00",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "timer"
+                ],
+                "summary": "Reset the timer",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/timer/set": {
+            "post": {
+                "description": "Sets the main timer to a specific value in mm:ss format",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "timer"
+                ],
+                "summary": "Set the timer",
+                "parameters": [
+                    {
+                        "description": "Timer in mm:ss format",
+                        "name": "timer",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SetTimerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.SetShotClockRequest": {
+            "description": "Timer in ss.x format",
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.SetTimerRequest": {
+            "description": "Timer in mm:ss format",
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

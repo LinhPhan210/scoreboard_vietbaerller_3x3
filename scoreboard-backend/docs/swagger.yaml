@@ -1,0 +1,275 @@
+definitions:
+  handlers.SetShotClockRequest:
+    description: Timer in ss.x format
+    properties:
+      time:
+        type: string
+    type: object
+  handlers.SetTimerRequest:
+    description: Timer in mm:ss format
+    properties:
+      time:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/foulA/decrement:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Decrement Team A foul
+      tags:
+      - foul
+  /api/foulA/increment:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Increment Team A foul
+      tags:
+      - foul
+  /api/foulB/decrement:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Decrement Team B foul
+      tags:
+      - foul
+  /api/foulB/increment:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Increment Team B foul
+      tags:
+      - foul
+  /api/game/reset:
+    post:
+      description: Resets timer, shot clock, and both team scores to default values
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Reset the game
+      tags:
+      - game
+  /api/log:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get change log
+      tags:
+      - log
+  /api/scoreA/decrement:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Decrement Team A score
+      tags:
+      - score
+  /api/scoreA/increment:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Increment Team A score
+      tags:
+      - score
+  /api/scoreB/decrement:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Decrement Team B score
+      tags:
+      - score
+  /api/scoreB/increment:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Increment Team B score
+      tags:
+      - score
+  /api/shotclock/reset:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Reset the shot clock
+      tags:
+      - shotclock
+  /api/shotclock/set:
+    post:
+      consumes:
+      - application/json
+      description: Sets the shot clock to a specific value in ss.x format
+      parameters:
+      - description: Shot clock in ss.x format
+        in: body
+        name: shotclock
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SetShotClockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Set the shot clock
+      tags:
+      - shotclock
+  /api/shotclock/start:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Start the shot clock
+      tags:
+      - shotclock
+  /api/shotclock/stop:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Stop the shot clock
+      tags:
+      - shotclock
+  /api/state:
+    get:
+      description: Returns the current state of the scoreboard, including timer, scores,
+        and shot clock
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get current scoreboard state
+      tags:
+      - state
+  /api/state/sync:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Trigger state_sync WebSocket broadcast
+      tags:
+      - state
+  /api/timer/reset:
+    post:
+      description: Resets the main timer to 10:00
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Reset the timer
+      tags:
+      - timer
+  /api/timer/set:
+    post:
+      consumes:
+      - application/json
+      description: Sets the main timer to a specific value in mm:ss format
+      parameters:
+      - description: Timer in mm:ss format
+        in: body
+        name: timer
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SetTimerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Set the timer
+      tags:
+      - timer
+swagger: "2.0"
