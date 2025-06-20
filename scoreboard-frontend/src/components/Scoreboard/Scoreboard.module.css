@@ -6,6 +6,7 @@
   background-color: #121212;
   color: white;
   padding: 20px;
+  position: relative;
 }
 
 .header {
@@ -179,6 +180,42 @@
   z-index: 1;
 }
 
+/* Fullscreen Button */
+.fullscreenButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #FFD700;
+  border: none;
+  color: #121212;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  font-size: 0;
+}
+
+.fullscreenButton:hover {
+  background: #FFA500;
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+}
+
+.fullscreenButton:active {
+  transform: scale(0.95);
+}
+
+.fullscreenButton svg {
+  width: 24px;
+  height: 24px;
+}
+
 @media (max-width: 900px) {
   .score {
     font-size: clamp(2.5rem, 20vw, 8rem);
@@ -212,6 +249,17 @@
   .foulValue {
     font-size: 1.2rem !important;
   }
+  .fullscreenButton {
+    width: 50px;
+    height: 50px;
+    bottom: 15px;
+    right: 15px;
+  }
+  
+  .fullscreenButton svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 /* --- iPhone 13 Pro Landscape (844x390) and similar --- */
@@ -231,6 +279,17 @@
   }
   .foulValue {
     font-size: 1rem !important;
+  }
+  .fullscreenButton {
+    bottom: 10px;
+    right: 10px;
+    width: 45px;
+    height: 45px;
+  }
+  
+  .fullscreenButton svg {
+    width: 18px;
+    height: 18px;
   }
 }
 
