@@ -1,0 +1,667 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.timer-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+    min-width: 900px;
+}
+
+.game-timer, .shot-clock {
+    text-align: center;
+}
+
+.game-timer h2, .shot-clock h2 {
+    color: white;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.timer-display {
+    font-size: 4rem;
+    font-weight: bold;
+    padding: 1rem;
+    border-radius: 15px;
+    margin-bottom: 1rem;
+    text-align: center;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.game-display {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    font-family: 'Courier New', monospace;
+}
+
+.shot-display {
+    background: linear-gradient(135deg, #4834d4, #686de0);
+    color: white;
+    font-family: 'Courier New', monospace;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.control-btn {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.start-stop {
+    background: linear-gradient(135deg, #00b894, #00a085);
+    color: white;
+}
+
+.start-stop:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 184, 148, 0.3);
+}
+
+.start-stop.stop {
+    background: linear-gradient(135deg, #e17055, #d63031);
+}
+
+.start-stop.stop:hover {
+    box-shadow: 0 8px 16px rgba(214, 48, 49, 0.3);
+}
+
+.reset {
+    background: linear-gradient(135deg, #636e72, #2d3436);
+    color: white;
+}
+
+.reset:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(99, 110, 114, 0.3);
+}
+
+.control-btn:active {
+    transform: translateY(0);
+}
+
+/* Running state visual feedback */
+.running .game-display {
+    animation: pulse 1s infinite;
+}
+
+.running .shot-display {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+/* Responsive design for different screen sizes */
+
+/* Large monitors and desktops (1400px and above) - Portrait only */
+@media (min-width: 1400px) and (orientation: portrait) {
+    .container {
+        padding: 3rem;
+        max-width: 1200px;
+    }
+    
+    .timer-section {
+        gap: 3rem;
+        min-width: 1000px;
+    }
+    
+    .timer-display {
+        font-size: 5rem;
+        min-height: 150px;
+    }
+    
+    .game-timer h2, .shot-clock h2 {
+        font-size: 2rem;
+    }
+    
+    .control-btn {
+        padding: 1.5rem 2.5rem;
+        font-size: 1.4rem;
+        min-width: 180px;
+    }
+}
+
+/* Standard monitors and laptops (1000px to 1399px) - Portrait only */
+@media (min-width: 1000px) and (max-width: 1399px) and (orientation: portrait) {
+    .timer-section {
+        min-width: 900px;
+        gap: 2rem;
+    }
+    
+    .timer-display {
+        font-size: 4rem;
+        min-height: 120px;
+    }
+}
+
+/* Landscape tablets and small laptops (768px to 999px) - Portrait only */
+@media (min-width: 768px) and (max-width: 999px) and (orientation: portrait) {
+    .container {
+        padding: 2rem;
+        max-width: 700px;
+    }
+    
+    .timer-section {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 1.5rem;
+        min-width: auto;
+    }
+    
+    .game-timer {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    .shot-clock {
+        grid-column: 2;
+        grid-row: 1;
+    }
+    
+    .controls {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        flex-direction: row;
+        justify-content: center;
+        gap: 2rem;
+    }
+    
+    .timer-display {
+        font-size: 3.5rem;
+        min-height: 110px;
+    }
+    
+    .game-timer h2, .shot-clock h2 {
+        font-size: 1.4rem;
+    }
+    
+    .control-btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        min-width: 140px;
+    }
+}
+
+/* Portrait tablets and large phones (481px to 767px) - Portrait only */
+@media (min-width: 481px) and (max-width: 767px) and (orientation: portrait) {
+    body {
+        padding: 0;
+    }
+    
+    .container {
+        background: none;
+        backdrop-filter: none;
+        border-radius: 0;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        border: none;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .timer-section {
+        display: grid;
+        grid-template-columns: 4fr 8fr 4fr;
+        gap: 0;
+        min-width: auto;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .game-timer {
+        order: 1;
+        grid-column: 1;
+        padding: 1rem;
+        border-right: 2px solid rgba(255, 255, 255, 0.3);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .shot-clock {
+        order: 2;
+        grid-column: 2;
+        padding: 1rem;
+        border-right: 2px solid rgba(255, 255, 255, 0.3);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .controls {
+        order: 3;
+        grid-column: 3;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        height: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding-top: 2.5rem;
+    }
+    
+    .timer-display {
+        font-size: 2.5rem;
+        min-height: 90px;
+        padding: 0.6rem;
+        background: none !important;
+        box-shadow: none;
+        border-radius: 0;
+    }
+    
+    .shot-clock .timer-display {
+        font-size: 3.5rem;
+        min-height: 110px;
+    }
+    
+    .game-timer .timer-display {
+        font-size: 2rem;
+        min-height: 80px;
+    }
+    
+    .game-timer h2, .shot-clock h2 {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .control-btn {
+        padding: 1rem 1.5rem;
+        font-size: 0.9rem;
+        min-width: 100px;
+    }
+}
+
+/* Small phones - Portrait (320px to 480px) - Portrait only */
+@media (max-width: 480px) and (orientation: portrait) {
+    body {
+        padding: 0;
+    }
+    
+    .container {
+        background: none;
+        backdrop-filter: none;
+        border-radius: 0;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        border: none;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .timer-section {
+        display: grid;
+        grid-template-columns: 4fr 8fr 4fr;
+        gap: 0;
+        min-width: auto;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .game-timer {
+        order: 1;
+        grid-column: 1;
+        padding: 0.8rem;
+        border-right: 2px solid rgba(255, 255, 255, 0.3);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .shot-clock {
+        order: 2;
+        grid-column: 2;
+        padding: 0.8rem;
+        border-right: 2px solid rgba(255, 255, 255, 0.3);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .controls {
+        order: 3;
+        grid-column: 3;
+        flex-direction: column;
+        gap: 0.8rem;
+        padding: 0.8rem;
+        height: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding-top: 2rem;
+    }
+    
+    .timer-display {
+        font-size: 2rem;
+        min-height: 75px;
+        padding: 0.4rem;
+        background: none !important;
+        box-shadow: none;
+        border-radius: 0;
+    }
+    
+    .shot-clock .timer-display {
+        font-size: 3rem;
+        min-height: 100px;
+    }
+    
+    .game-timer .timer-display {
+        font-size: 1.7rem;
+        min-height: 65px;
+    }
+    
+    .game-timer h2, .shot-clock h2 {
+        font-size: 0.85rem;
+        margin-bottom: 0.8rem;
+        letter-spacing: 1px;
+    }
+    
+    .control-btn {
+        padding: 0.8rem 1rem;
+        font-size: 0.75rem;
+        min-width: 80px;
+        border-radius: 8px;
+    }
+}
+
+/* Very small phones (max 320px) - Portrait only */
+@media (max-width: 320px) and (orientation: portrait) {
+    .container {
+        padding: 0.8rem;
+        margin: 0.3rem;
+    }
+    
+    .timer-display {
+        font-size: 1.8rem;
+        min-height: 70px;
+        padding: 0.5rem;
+    }
+    
+    .game-timer h2, .shot-clock h2 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .control-btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.8rem;
+        min-width: 90px;
+    }
+}
+
+/* Landscape orientation for ALL screen sizes */
+@media (orientation: landscape) {
+    body {
+        min-height: auto;
+        padding: 0;
+        background: black;
+    }
+    
+    .container {
+        background: none;
+        backdrop-filter: none;
+        border-radius: 0;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        border: none;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .timer-section {
+        display: grid;
+        grid-template-columns: 4fr 8fr 2fr;
+        gap: 0;
+        min-width: auto;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .game-timer {
+        order: 1;
+        grid-column: 1;
+        padding: 1rem;
+        border-right: 2px solid rgba(255, 255, 255, 0.3);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    
+    .shot-clock {
+        order: 2;
+        grid-column: 2;
+        padding: 1rem;
+        border-right: 2px solid rgba(255, 255, 255, 0.3);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    
+    .controls {
+        order: 3;
+        grid-column: 3;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1rem;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .timer-display {
+        background: none !important;
+        box-shadow: none;
+        border-radius: 0;
+    }
+    
+    .shot-clock .timer-display {
+        font-size: 8rem;
+        min-height: 200px;
+        padding: 0.8rem;
+        color: lightcoral;
+        font-family: 'Orbitron', 'Courier New', monospace;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .game-timer .timer-display {
+        font-size: 2.5rem;
+        min-height: 80px;
+        padding: 0.6rem;
+        color: lightyellow;
+        font-family: 'Share Tech Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-weight: normal;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .game-timer h2, .shot-clock h2 {
+        font-size: 1.2rem;
+        margin-bottom: 0;
+        margin-top: 0;
+        color: white;
+        align-self: flex-start;
+        width: 100%;
+        text-align: center;
+        flex-shrink: 0;
+    }
+    
+    .game-timer .timer-display,
+    .shot-clock .timer-display {
+        flex: 1;
+    }
+    
+    .edit-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: auto;
+        align-self: center;
+        min-width: 60px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .edit-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
+    }
+    
+    .edit-btn.editing {
+        background: rgba(255, 165, 0, 0.3);
+        border-color: orange;
+        color: orange;
+    }
+    
+    .timer-display.editing {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 2px solid orange !important;
+        outline: none;
+        cursor: text;
+    }
+    
+    .control-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        min-width: 120px;
+        border-radius: 8px;
+    }
+    
+    /* Alert states for expired timers */
+    .shot-clock-expired {
+        background: rgba(255, 255, 0, 0.15) !important;
+        border-left: 4px solid #FFD700 !important;
+        border-right: 4px solid #FFD700 !important;
+        animation: pulseYellow 1s infinite;
+    }
+    
+    .game-timer-expired {
+        background: rgba(255, 0, 0, 0.15) !important;
+        border-left: 4px solid #FF4444 !important;
+        border-right: 4px solid #FF4444 !important;
+        animation: pulseRed 1s infinite;
+    }
+    
+    @keyframes pulseYellow {
+        0% { background: rgba(255, 255, 0, 0.15); }
+        50% { background: rgba(255, 255, 0, 0.25); }
+        100% { background: rgba(255, 255, 0, 0.15); }
+    }
+    
+    @keyframes pulseRed {
+        0% { background: rgba(255, 0, 0, 0.15); }
+        50% { background: rgba(255, 0, 0, 0.25); }
+        100% { background: rgba(255, 0, 0, 0.15); }
+    }
+}
+
+/* Fullscreen button styling */
+#fullscreenBtn:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    transform: scale(1.1);
+}
+
+/* Alert states for expired timers - Portrait modes */
+@media (orientation: portrait) {
+    .shot-clock-expired {
+        background: rgba(255, 255, 0, 0.15) !important;
+        border-top: 4px solid #FFD700 !important;
+        border-bottom: 4px solid #FFD700 !important;
+        animation: pulseYellow 1s infinite;
+    }
+    
+    .game-timer-expired {
+        background: rgba(255, 0, 0, 0.15) !important;
+        border-top: 4px solid #FF4444 !important;
+        border-bottom: 4px solid #FF4444 !important;
+        animation: pulseRed 1s infinite;
+    }
+}
