@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Version Check</title>
+</head>
+<body>
+    <h1>Version Check</h1>
+    <p>If you see this page, the Docker container is serving the latest files.</p>
+    <p>Current timestamp: <script>document.write(new Date().toISOString())</script></p>
+    
+    <h2>JavaScript Test</h2>
+    <div id="test-output"></div>
+    
+    <script src="jquery.min.js?v=2025080916"></script>
+    <script src="jquery-ui.min.js?v=2025080916"></script>
+    <script src="sevenSeg.js?v=2025080916"></script>
+    
+    <script>
+        console.log('=== VERSION CHECK ===');
+        console.log('jQuery loaded:', typeof $ !== 'undefined');
+        console.log('jQuery UI loaded:', typeof $.ui !== 'undefined');
+        console.log('sevenSeg loaded:', typeof $.fn.sevenSeg !== 'undefined');
+        
+        document.getElementById('test-output').innerHTML = 
+            'jQuery: ' + (typeof $ !== 'undefined' ? '✅' : '❌') + '<br>' +
+            'jQuery UI: ' + (typeof $.ui !== 'undefined' ? '✅' : '❌') + '<br>' +
+            'sevenSeg: ' + (typeof $.fn.sevenSeg !== 'undefined' ? '✅' : '❌');
+            
+        // Test seven-segment creation
+        if (typeof $ !== 'undefined' && typeof $.fn.sevenSeg !== 'undefined') {
+            console.log('Testing seven-segment initialization...');
+            try {
+                $('<div>').sevenSeg({value: 12.0, digits: 3});
+                console.log('✅ Seven-segment test successful!');
+            } catch (e) {
+                console.error('❌ Seven-segment test failed:', e);
+            }
+        }
+    </script>
+</body>
+</html>

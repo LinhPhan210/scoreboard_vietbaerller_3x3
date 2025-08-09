@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seven-Segment Test</title>
+    <script src="jquery.min.js"></script>
+    <script src="jquery-ui.min.js"></script>
+    <script src="sevenSeg.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+        }
+        .test-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        #testDisplay {
+            width: auto;
+            height: 80px;
+            margin: 20px 0;
+            min-width: 120px;
+            max-width: 150px;
+        }
+        .status {
+            background: #34495e;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Seven-Segment Display Test</h1>
+    
+    <div class="test-container">
+        <h2>Library Status Check</h2>
+        <div id="jqueryStatus" class="status">Checking jQuery...</div>
+        <div id="jqueryUIStatus" class="status">Checking jQuery UI...</div>
+        <div id="sevenSegStatus" class="status">Checking sevenSeg.js...</div>
+    </div>
+    
+    <div class="test-container">
+        <h2>Seven-Segment Display Test</h2>
+        <div id="testDisplay"></div>
+        <button onclick="updateDisplay()">Update to Random Number</button>
+        <button onclick="startCountdown()">Test Countdown to Zero</button>
+        <button onclick="stopCountdown()">Stop Countdown</button>
+        <div id="displayStatus" class="status">Initializing...</div>
+    </div>
+
+    <script>
+        let currentValue = 12.0;
+        let countdownInterval = null;
+        
+        function checkLibraries() {
+            // Check jQuery
+            if (typeof $ !== 'undefined') {
+                document.getElementById('jqueryStatus').innerHTML = '✅ jQuery loaded successfully';
+                document.getElementById('jqueryStatus').style.background = '#27ae60';
+            } else {
+                document.getElementById('jqueryStatus').innerHTML = '❌ jQuery not loaded';
+                document.getElementById('jqueryStatus').style.background = '#e74c3c';
+                return false;
+            }
+            
+            // Check jQuery UI
+            if (typeof $.ui !== 'undefined') {
+                document.getElementById('jqueryUIStatus').innerHTML = '✅ jQuery UI loaded successfully';
+                document.getElementById('jqueryUIStatus').style.background = '#27ae60';
+            } else {
+                document.getElementById('jqueryUIStatus').innerHTML = '❌ jQuery UI not loaded';
+                document.getElementById('jqueryUIStatus').style.background = '#e74c3c';
+                return false;
+            }
+            
+            // Check sevenSeg
+            if (typeof $.fn.sevenSeg !== 'undefined') {
+                document.getElementById('sevenSegStatus').innerHTML = '✅ sevenSeg.js loaded successfully';
+                document.getElementById('sevenSegStatus').style.background = '#27ae60';
+                return true;
+            } else {
+                document.getElementById('sevenSegStatus').innerHTML = '❌ sevenSeg.js not loaded';
+                document.getElementById('sevenSegStatus').style.background = '#e74c3c';
+                return false;
+            }
+        }
+        
+        function initializeDisplay() {
+            if (!checkLibraries()) {
+                document.getElementById('displayStatus').innerHTML = '❌ Cannot initialize - missing libraries';
+                document.getElementById('displayStatus').style.background = '#e74c3c';
+                return;
+            }
+            
+            try {
+                $('#testDisplay').sevenSeg({
+                    digits: 3,  // Better spacing with 3 digits
+                    value: currentValue,
+                    colorOn: '#FF6B35',
+                    colorOff: '#331100',
+                    colorBackground: 'transparent',
+                    slant: 5,  // Reduced slant for better readability
+                    decimalPlaces: 1,
+                    decimalPoint: true
+                });
+                
+                document.getElementById('displayStatus').innerHTML = '✅ Seven-segment display initialized successfully';
+                document.getElementById('displayStatus').style.background = '#27ae60';
+            } catch (error) {
+                document.getElementById('displayStatus').innerHTML = '❌ Error initializing display: ' + error.message;
+                document.getElementById('displayStatus').style.background = '#e74c3c';
+                console.error('Error:', error);
+            }
+        }
+        
+        function updateDisplay() {
+            currentValue = Math.random() * 99;
+            try {
+                // Try the widget option method first
+                $('#testDisplay').sevenSeg('option', 'value', currentValue);
+                document.getElementById('displayStatus').innerHTML = '✅ Display updated to: ' + currentValue.toFixed(1);
+            } catch (error) {
+                try {
+                    // Fallback method
+                    $('#testDisplay').sevenSeg({ value: currentValue });
+                    document.getElementById('displayStatus').innerHTML = '✅ Display updated (fallback) to: ' + currentValue.toFixed(1);
+                } catch (e2) {
+                    document.getElementById('displayStatus').innerHTML = '❌ Error updating display: ' + error.message;
+                    console.error('Error:', error);
+                }
+            }
+        }
+        
+        let lastValue = null;
+        
+        function startCountdown() {
+            stopCountdown(); // Stop any existing countdown
+            currentValue = 5.0; // Start from 5 seconds for faster testing
+            lastValue = null;
+            countdownInterval = setInterval(() => {
+                currentValue -= 0.1;
+                // Round to avoid floating point precision issues
+                currentValue = Math.round(currentValue * 10) / 10;
+                
+                if (currentValue <= 0) {
+                    currentValue = 0; // Show exactly 0.0
+                    // Update display to show 0.0
+                    try {
+                        const currentSeconds = Math.floor(currentValue);
+                        const prevSeconds = lastValue ? Math.floor(lastValue) : currentSeconds;
+                        
+                        if (currentSeconds !== prevSeconds || !lastValue) {
+                            console.log(`Test: Digit boundary ${prevSeconds} -> ${currentSeconds}, force re-render`);
+                            if ($('#testDisplay').data('bw-sevenSeg')) {
+                                $('#testDisplay').sevenSeg('destroy');
+                            }
+                            $('#testDisplay').empty();
+                            $('#testDisplay').sevenSeg({
+                                digits: 3,
+                                value: currentValue,
+                                colorOn: '#FF6B35',
+                                colorOff: '#331100',
+                                colorBackground: 'transparent',
+                                slant: 5,
+                                decimalPlaces: 1,
+                                decimalPoint: true
+                            });
+                        } else {
+                            $('#testDisplay').sevenSeg('option', 'value', currentValue);
+                        }
+                        
+                        lastValue = currentValue;
+                        document.getElementById('displayStatus').innerHTML = `⏱️ ZERO REACHED: ${currentValue.toFixed(1)}`;
+                        
+                        // Stop countdown after showing 0.0
+                        setTimeout(() => {
+                            currentValue = 5.0; // Reset for next test
+                            lastValue = null;
+                        }, 1000);
+                        
+                    } catch (error) {
+                        console.error('Countdown update failed:', error);
+                    }
+                    return; // Stop here to show 0.0
+                }
+                
+                try {
+                    const currentSeconds = Math.floor(currentValue);
+                    const prevSeconds = lastValue ? Math.floor(lastValue) : currentSeconds;
+                    
+                    if (currentSeconds !== prevSeconds || !lastValue) {
+                        console.log(`Test: Digit boundary ${prevSeconds} -> ${currentSeconds}, force re-render`);
+                        // Force re-render on digit boundary
+                        if ($('#testDisplay').data('bw-sevenSeg')) {
+                            $('#testDisplay').sevenSeg('destroy');
+                        }
+                        $('#testDisplay').empty();
+                        $('#testDisplay').sevenSeg({
+                            digits: 3,
+                            value: currentValue,
+                            colorOn: '#FF6B35',
+                            colorOff: '#331100',
+                            colorBackground: 'transparent',
+                            slant: 5,
+                            decimalPlaces: 1,
+                            decimalPoint: true
+                        });
+                    } else {
+                        $('#testDisplay').sevenSeg('option', 'value', currentValue);
+                    }
+                    
+                    lastValue = currentValue;
+                    document.getElementById('displayStatus').innerHTML = `⏱️ Countdown: ${currentValue.toFixed(1)}`;
+                } catch (error) {
+                    console.error('Countdown update failed:', error);
+                    document.getElementById('displayStatus').innerHTML = `❌ Error: ${error.message}`;
+                }
+            }, 100);
+        }
+        
+        function stopCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+        }
+        
+        // Initialize when ready
+        $(document).ready(function() {
+            setTimeout(initializeDisplay, 100);
+        });
+        
+        // Fallback initialization
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (document.getElementById('displayStatus').innerHTML === 'Initializing...') {
+                    initializeDisplay();
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -72,6 +72,43 @@ body {
     font-family: 'Courier New', monospace;
 }
 
+/* Seven-segment display styling */
+.shot-clock-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.seven-segment-display {
+    width: 60%;
+    height: 120px;
+    display: none; /* Hidden by default, shown when initialized */
+    min-width: 100px; /* Ensure minimum width for proper digit spacing */
+}
+
+/* Override sevenSeg default styles */
+.seven-segment-display .sevenSeg-svg {
+    width: 100% !important;
+    height: 100% !important;
+    background: transparent !important;
+}
+
+/* Ensure seven-segment display matches timer display dimensions */
+.seven-segment-display svg {
+    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.2);
+    min-width: 200px; /* Ensure SVG has enough space */
+}
+
+/* Better spacing for seven-segment digits */
+.seven-segment-display g {
+    margin: 0 2px; /* Add some spacing between digits */
+}
+
 .controls {
     display: flex;
     flex-direction: column;
@@ -312,6 +349,15 @@ body {
         min-height: 110px;
     }
     
+    .shot-clock .seven-segment-display {
+        height: 110px;
+        min-width: 180px; /* Better width for portrait tablets */
+    }
+    
+    .shot-clock .seven-segment-display svg {
+        min-width: 180px !important;
+    }
+    
     .game-timer .timer-display {
         font-size: 2rem;
         min-height: 80px;
@@ -409,6 +455,15 @@ body {
     .shot-clock .timer-display {
         font-size: 3rem;
         min-height: 100px;
+    }
+    
+    .shot-clock .seven-segment-display {
+        height: 100px;
+        min-width: 160px; /* Better width for smaller phones */
+    }
+    
+    .shot-clock .seven-segment-display svg {
+        min-width: 160px !important;
     }
     
     .game-timer .timer-display {
@@ -544,6 +599,22 @@ body {
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+    
+    /* Seven-segment display in landscape mode */
+    .shot-clock .seven-segment-display {
+        height: 200px;
+        min-width: 300px; /* Wider in landscape for better visibility */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .shot-clock .seven-segment-display svg {
+        background: transparent !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        min-width: 300px !important; /* Ensure SVG is wide enough */
     }
     
     .game-timer .timer-display {

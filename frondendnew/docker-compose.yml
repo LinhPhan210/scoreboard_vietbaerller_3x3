@@ -5,7 +5,7 @@ services:
     build: .
     container_name: basketball-timer-app
     ports:
-      - "3001:80"
+      - "3002:80"
     restart: unless-stopped
     networks:
       - basketball-timer-network

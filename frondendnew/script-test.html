@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Script Test</title>
+</head>
+<body>
+    <h1>Script Version Test</h1>
+    <div id="test-results"></div>
+    
+    <!-- Required DOM elements for TimerApp -->
+    <div style="display: none;">
+        <div id="gameTimer">10:00</div>
+        <div id="shotClock">12.0</div>
+        <div id="shotClockSevenSeg"></div>
+        <button id="startStopBtn">START</button>
+        <button id="resetBtn">RESET</button>
+        <button id="editGameBtn">EDIT</button>
+        <button id="editShotBtn">EDIT</button>
+    </div>
+    
+    <script src="jquery.min.js?v=2025080916"></script>
+    <script src="jquery-ui.min.js?v=2025080916"></script>
+    <script src="sevenSeg.js?v=2025080916"></script>
+    <script src="script.js?v=2025080916"></script>
+    
+    <script>
+        setTimeout(() => {
+            const results = document.getElementById('test-results');
+            
+            // Check if TimerApp class exists and has our new methods
+            const hasTimerApp = typeof TimerApp !== 'undefined';
+            const hasDebugLogs = hasTimerApp && TimerApp.toString().includes('Basketball Timer Constructor');
+            const hasSevenSegMethod = hasTimerApp && TimerApp.prototype.initializeSevenSegment;
+            
+            results.innerHTML = `
+                <p><strong>TimerApp class exists:</strong> ${hasTimerApp ? '✅' : '❌'}</p>
+                <p><strong>Has debug logs:</strong> ${hasDebugLogs ? '✅' : '❌'}</p>
+                <p><strong>Has seven-segment method:</strong> ${hasSevenSegMethod ? '✅' : '❌'}</p>
+                <hr>
+                <p><strong>Test creating TimerApp:</strong></p>
+            `;
+            
+            if (hasTimerApp) {
+                try {
+                    // This should show our debug logs in console
+                    new TimerApp();
+                    results.innerHTML += '<p style="color: green;">✅ TimerApp created successfully! Check console for debug logs.</p>';
+                } catch (e) {
+                    results.innerHTML += `<p style="color: red;">❌ Error creating TimerApp: ${e.message}</p>`;
+                }
+            } else {
+                results.innerHTML += '<p style="color: red;">❌ TimerApp class not found</p>';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

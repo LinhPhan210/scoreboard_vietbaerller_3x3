@@ -1,5 +1,6 @@
 class TimerApp {
     constructor() {
+        console.log('🏀 Basketball Timer Constructor called!');
         // Timer state
         this.isRunning = false;
         this.gameTimeLeft = 10 * 60.0; // 10 minutes in seconds with decimals
@@ -20,6 +21,10 @@ class TimerApp {
         this.isEditingGame = false;
         this.isEditingShot = false;
         
+        // Seven-segment display flag
+        this.sevenSegInitialized = false;
+        this.lastSevenSegValue = null;
+        
         // Create fullscreen button
         this.createFullscreenButton();
         
@@ -28,6 +33,10 @@ class TimerApp {
         this.updateDisplays();
         this.bindEvents();
         this.updateFullscreenButton();
+        
+        // Initialize seven-segment display immediately
+        console.log('🏀 Basketball Timer initialized - calling seven-segment...');
+        this.initializeSevenSegment();
     }
     
     createFullscreenButton() {
@@ -186,6 +195,80 @@ class TimerApp {
         }
     }
     
+    initializeSevenSegment() {
+        // Wait for both jQuery and sevenSeg to be ready
+        const initSevenSeg = () => {
+            try {
+                console.log('Attempting to initialize seven-segment display...');
+                console.log('jQuery available:', typeof $ !== 'undefined');
+                console.log('sevenSeg available:', typeof $.fn !== 'undefined' && typeof $.fn.sevenSeg !== 'undefined');
+                
+                // Check if jQuery and sevenSeg are available
+                if (typeof $ === 'undefined') {
+                    console.error('jQuery not loaded - showing original display');
+                    this.shotDisplay.style.display = 'block';
+                    document.getElementById('shotClockSevenSeg').style.display = 'none';
+                    return;
+                }
+                
+                if (typeof $.fn.sevenSeg === 'undefined') {
+                    console.error('sevenSeg plugin not loaded - showing original display');
+                    this.shotDisplay.style.display = 'block';
+                    document.getElementById('shotClockSevenSeg').style.display = 'none';
+                    return;
+                }
+                
+                console.log('Libraries loaded, initializing seven-segment...');
+                
+                // Initialize seven-segment display for shot clock
+                $('#shotClockSevenSeg').sevenSeg({
+                    digits: 3,  // For format like "12.0" - using 3 digits for better spacing
+                    value: this.shotTimeLeft,
+                    colorOn: '#FF6B35',     // Orange/red color
+                    colorOff: '#331100',    // Dark orange for off segments
+                    colorBackground: 'transparent',
+                    slant: 5,               // Reduced slant for better readability
+                    decimalPlaces: 1,       // Show one decimal place
+                    decimalPoint: true,     // Show decimal point
+                    digitSpacing: 0         // Minimize spacing between digits
+                });
+                
+                this.sevenSegInitialized = true;
+                console.log('Seven-segment display initialized successfully');
+                
+                // Hide the original shot display, show seven-segment
+                this.shotDisplay.style.display = 'none';
+                document.getElementById('shotClockSevenSeg').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error initializing seven-segment display:', error);
+                console.error('Falling back to original display');
+                // Keep original display visible on error
+                this.shotDisplay.style.display = 'block';
+                document.getElementById('shotClockSevenSeg').style.display = 'none';
+            }
+        };
+        
+        // Try immediate initialization since scripts load after DOM
+        if (typeof $ !== 'undefined' && typeof $.fn.sevenSeg !== 'undefined') {
+            console.log('✅ Libraries ready - initializing immediately');
+            initSevenSeg();
+        } else {
+            console.log('⚠️ Libraries not ready - using fallbacks');
+            // Quick fallback: try again very soon
+            if (typeof $ !== 'undefined') {
+                $(document).ready(() => {
+                    initSevenSeg();
+                });
+            } else {
+                // Last resort: wait for window load
+                window.addEventListener('load', () => {
+                    initSevenSeg();
+                });
+            }
+        }
+    }
+    
     // Optional: Add method to reset game timer if needed later
     resetGameTimer() {
         // Clear any alert states when resetting
@@ -283,6 +366,14 @@ class TimerApp {
         this.isEditingShot = true;
         this.editShotBtn.textContent = 'SAVE';
         this.editShotBtn.classList.add('editing');
+        
+        // Show original display for editing, hide seven-segment
+        this.shotDisplay.style.display = 'block';
+        const sevenSegElement = document.getElementById('shotClockSevenSeg');
+        if (sevenSegElement) {
+            sevenSegElement.style.display = 'none';
+        }
+        
         this.shotDisplay.classList.add('editing');
         this.shotDisplay.contentEditable = true;
         this.shotDisplay.focus();
@@ -372,6 +463,19 @@ class TimerApp {
         this.editShotBtn.classList.remove('editing');
         this.shotDisplay.classList.remove('editing');
         this.shotDisplay.contentEditable = false;
+        
+        // Hide original display, show seven-segment again (if available)
+        if (this.sevenSegInitialized) {
+            this.shotDisplay.style.display = 'none';
+            const sevenSegElement = document.getElementById('shotClockSevenSeg');
+            if (sevenSegElement) {
+                sevenSegElement.style.display = 'block';
+            }
+        } else {
+            // Keep original display if seven-segment isn't available
+            this.shotDisplay.style.display = 'block';
+        }
+        
         this.saveState();
     }
     
@@ -465,7 +569,57 @@ class TimerApp {
     updateShotDisplay() {
         const seconds = Math.floor(this.shotTimeLeft);
         const tenths = Math.floor((this.shotTimeLeft % 1) * 10);
-        this.shotDisplay.textContent = `${seconds.toString().padStart(2, '0')}.${tenths}`;
+        const displayText = `${seconds.toString().padStart(2, '0')}.${tenths}`;
+        
+
+        
+        // Update original display (for fallback and edit mode)
+        this.shotDisplay.textContent = displayText;
+        
+        // Update seven-segment display if initialized
+        if (this.sevenSegInitialized && typeof $ !== 'undefined' && $('#shotClockSevenSeg').length) {
+            try {
+                const $element = $('#shotClockSevenSeg');
+                
+                // Check if we're crossing a digit boundary (like 10.x -> 9.x)
+                const currentSeconds = Math.floor(this.shotTimeLeft);
+                const prevValue = this.lastSevenSegValue || this.shotTimeLeft;
+                const prevSeconds = Math.floor(prevValue);
+                
+                if (currentSeconds !== prevSeconds || !this.lastSevenSegValue) {
+                    // Digit boundary crossed or first update - force full re-render
+                    console.log(`Digit boundary crossed: ${prevSeconds} -> ${currentSeconds}, force re-render`);
+                    
+                    if ($element.data('bw-sevenSeg')) {
+                        $element.sevenSeg('destroy');
+                    }
+                    $element.empty();
+                    
+                    $element.sevenSeg({
+                        digits: 3,
+                        value: this.shotTimeLeft,
+                        colorOn: '#FF6B35',
+                        colorOff: '#331100',
+                        colorBackground: 'transparent',
+                        slant: 5,
+                        decimalPlaces: 1,
+                        decimalPoint: true
+                    });
+                } else {
+                    // Same digit, just update the value normally
+                    $element.sevenSeg('option', 'value', this.shotTimeLeft);
+                }
+                
+                this.lastSevenSegValue = this.shotTimeLeft;
+                
+            } catch (error) {
+                console.error('Error updating seven-segment display:', error);
+                // Fall back to original display if seven-segment fails
+                this.shotDisplay.style.display = 'block';
+                document.getElementById('shotClockSevenSeg').style.display = 'none';
+                this.sevenSegInitialized = false;
+            }
+        }
     }
     
     saveState() {
@@ -517,5 +671,6 @@ class TimerApp {
 
 // Initialize the timer app when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🌐 DOM Content Loaded - creating TimerApp...');
     new TimerApp();
 }); 

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Seven-Segment Debug Test</title>
+    <script src="jquery.min.js"></script>
+    <script src="jquery-ui.min.js"></script>
+    <script src="sevenSeg.js"></script>
+    <style>
+        body { background: #2c3e50; color: white; padding: 20px; font-family: Arial, sans-serif; }
+        .test { background: rgba(255,255,255,0.1); padding: 20px; margin: 10px 0; border-radius: 10px; }
+        #testDisplay { width: 200px; height: 80px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>Seven-Segment Debug Test</h1>
+    
+    <div class="test">
+        <h2>Library Check</h2>
+        <div id="status"></div>
+    </div>
+    
+    <div class="test">
+        <h2>Seven-Segment Display</h2>
+        <div id="testDisplay"></div>
+        <button onclick="testSevenSeg()">Initialize Test Display</button>
+    </div>
+
+    <script>
+        function checkLibraries() {
+            let status = '';
+            status += 'jQuery: ' + (typeof $ !== 'undefined' ? '✅ Loaded' : '❌ Not loaded') + '<br>';
+            status += 'jQuery UI: ' + (typeof $.ui !== 'undefined' ? '✅ Loaded' : '❌ Not loaded') + '<br>';
+            status += 'sevenSeg: ' + (typeof $.fn.sevenSeg !== 'undefined' ? '✅ Loaded' : '❌ Not loaded') + '<br>';
+            
+            document.getElementById('status').innerHTML = status;
+        }
+        
+        function testSevenSeg() {
+            try {
+                if (typeof $.fn.sevenSeg === 'undefined') {
+                    alert('sevenSeg not available!');
+                    return;
+                }
+                
+                $('#testDisplay').sevenSeg({
+                    digits: 3,
+                    value: 12.5,
+                    colorOn: '#FF6B35',
+                    colorOff: '#331100',
+                    slant: 5,
+                    decimalPlaces: 1,
+                    decimalPoint: true
+                });
+                
+                alert('Seven-segment initialized successfully!');
+            } catch (error) {
+                alert('Error: ' + error.message);
+                console.error(error);
+            }
+        }
+        
+        // Run checks when page loads
+        window.addEventListener('load', () => {
+            setTimeout(checkLibraries, 100);
+        });
+    </script>
+</body>
+</html>

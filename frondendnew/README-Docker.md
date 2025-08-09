@@ -40,9 +40,9 @@ docker-compose logs -f
 
 ### Rebuild after code changes
 ```bash
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
+sudo docker compose down
+sudo docker compose build --no-cache
+sudo docker compose up -d
 ```
 
 ### Check container status

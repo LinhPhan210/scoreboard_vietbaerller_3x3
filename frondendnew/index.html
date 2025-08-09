@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Basketball Timer App</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2025080920">
 </head>
 <body>
     <div class="container">
@@ -17,7 +17,10 @@
             
             <div class="shot-clock">
                 <h2>Shot Clock</h2>
-                <div class="timer-display shot-display" id="shotClock">12.0</div>
+                <div class="shot-clock-container">
+                    <div class="timer-display shot-display" id="shotClock">12.0</div>
+                    <div class="seven-segment-display" id="shotClockSevenSeg"></div>
+                </div>
                 <button id="editShotBtn" class="edit-btn">EDIT</button>
             </div>
             
@@ -28,6 +31,13 @@
         </div>
     </div>
     
-    <script src="script.js"></script>
+    <!-- jQuery and jQuery UI for sevenSeg.js (local files) -->
+    <script src="jquery.min.js?v=2025080916"></script>
+    <script src="jquery-ui.min.js?v=2025080916"></script>
+    
+    <!-- sevenSeg.js library -->
+    <script src="sevenSeg.js?v=2025080916"></script>
+    
+    <script src="script.js?v=2025080920"></script>
 </body>
 </html> 
