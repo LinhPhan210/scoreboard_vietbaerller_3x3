@@ -1,0 +1,32 @@
+# Git files
+.git
+.gitignore
+
+# Documentation
+README.md
+
+# Docker files (keep Dockerfile and docker-compose.yml out of build context except for the Dockerfile itself)
+docker-compose.yml
+.dockerignore
+
+# Node modules (if any exist)
+node_modules
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Temporary files
+.tmp
+.temp

@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  basketball-timer:
+    build: .
+    container_name: basketball-timer-app
+    ports:
+      - "3001:80"
+    restart: unless-stopped
+    networks:
+      - basketball-timer-network
+
+networks:
+  basketball-timer-network:
+    driver: bridge
