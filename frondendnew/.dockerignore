@@ -7,6 +7,7 @@ README.md
 
 # Docker files (keep Dockerfile and docker-compose.yml out of build context except for the Dockerfile itself)
 docker-compose.yml
+docker-compose.dev.yml
 .dockerignore
 
 # Node modules (if any exist)

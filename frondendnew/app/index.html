@@ -4,9 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Basketball Timer App</title>
-    <link rel="stylesheet" href="style.css?v=2025080920">
+    <link rel="stylesheet" href="style.css?v=20250809173000">
 </head>
 <body>
+    <div class="rotate-screen-overlay">
+        <div class="rotate-screen-content">
+            <div class="rotate-device-icon"></div>
+            <p class="rotate-text">Rotate Device to Landscape</p>
+            <p class="rotate-subtext">This app is optimized for landscape scoreboard layout</p>
+        </div>
+    </div>
     <div class="container">
         <div class="timer-section">
             <div class="game-timer">
@@ -16,11 +23,8 @@
             </div>
             
             <div class="shot-clock">
-                <h2>Shot Clock</h2>
-                <div class="shot-clock-container">
-                    <div class="timer-display shot-display" id="shotClock">12.0</div>
-                    <div class="seven-segment-display" id="shotClockSevenSeg"></div>
-                </div>
+                <h2><img src="logo.jpg" class="logo" alt="Logo"><span>Shot Clock</span></h2>
+                <div class="timer-display shot-display" id="shotClock">12.0</div>
                 <button id="editShotBtn" class="edit-btn">EDIT</button>
             </div>
             
@@ -31,13 +35,6 @@
         </div>
     </div>
     
-    <!-- jQuery and jQuery UI for sevenSeg.js (local files) -->
-    <script src="jquery.min.js?v=2025080916"></script>
-    <script src="jquery-ui.min.js?v=2025080916"></script>
-    
-    <!-- sevenSeg.js library -->
-    <script src="sevenSeg.js?v=2025080916"></script>
-    
-    <script src="script.js?v=2025080920"></script>
+    <script src="script.js"></script>
 </body>
-</html> 
+</html>
