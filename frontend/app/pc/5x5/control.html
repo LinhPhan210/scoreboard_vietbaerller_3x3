@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5x5 Basketball PC Operator Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Chakra+Petch:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --bg-card: #151c2c;
+            --bg-card-hover: #1e293b;
+            --border-color: #2a364f;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --color-home: #3b82f6;
+            --color-home-glow: rgba(59, 130, 246, 0.25);
+            --color-guest: #f97316;
+            --color-guest-glow: rgba(249, 115, 22, 0.25);
+            --color-amber: #eab308;
+            --color-green: #22c55e;
+            --color-red: #ef4444;
+
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-display: 'Chakra Petch', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+
+        /* Header Bar */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+
+        .badge-5x5 {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--color-green);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--color-green);
+            box-shadow: 0 0 8px var(--color-green);
+        }
+
+        /* 3-Column Dashboard Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Container */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .team-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .team-home { color: var(--color-home); }
+        .team-guest { color: var(--color-guest); }
+
+        /* Score Box */
+        .score-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .score-value {
+            font-family: var(--font-display);
+            font-size: 4.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .score-controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 0.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+
+        .btn:hover {
+            background: #28354d;
+            border-color: #3b4c6e;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-home {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        .btn-home:hover {
+            background: rgba(59, 130, 246, 0.3);
+            color: #fff;
+        }
+
+        .btn-guest {
+            background: rgba(249, 115, 22, 0.15);
+            color: #fb923c;
+            border-color: rgba(249, 115, 22, 0.3);
+        }
+        .btn-guest:hover {
+            background: rgba(249, 115, 22, 0.3);
+            color: #fff;
+        }
+
+        /* Steppers & Counters */
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-display {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            min-width: 2.5rem;
+            text-align: center;
+        }
+
+        .stepper-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-step {
+            width: 2.5rem;
+            height: 2.5rem;
+            padding: 0;
+            font-size: 1.2rem;
+            border-radius: 8px;
+        }
+
+        /* Timeout Toggle Buttons */
+        .tol-buttons {
+            display: flex;
+            gap: 0.4rem;
+            width: 100%;
+        }
+
+        .tol-btn {
+            flex: 1;
+            padding: 0.6rem 0;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .tol-btn.active {
+            background: var(--color-red);
+            color: #ffffff;
+            border-color: var(--color-red);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Possession Arrow Trigger Button */
+        .possession-btn {
+            width: 100%;
+            padding: 0.85rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .possession-btn.active {
+            background: rgba(234, 179, 8, 0.2);
+            color: var(--color-amber);
+            border-color: var(--color-amber);
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.25);
+        }
+
+        /* Center Column Controls */
+        .center-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Period Selector */
+        .period-selector {
+            display: flex;
+            gap: 0.4rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.35rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .period-btn {
+            flex: 1;
+            padding: 0.6rem 0;
+            font-size: 1rem;
+            font-weight: 700;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .period-btn.active {
+            background: var(--color-amber);
+            color: #000;
+            font-weight: 800;
+            box-shadow: 0 0 10px rgba(234, 179, 8, 0.4);
+        }
+
+        /* Timer Display Boxes */
+        .timer-container {
+            background: #060911;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem 1rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .game-clock-val {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--color-green);
+            text-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+
+        .shot-clock-val {
+            font-family: var(--font-display);
+            font-size: 3.2rem;
+            font-weight: 700;
+            color: var(--color-red);
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+            letter-spacing: 2px;
+            line-height: 1;
+            margin-top: 0.25rem;
+        }
+
+        /* Timer Buttons */
+        .btn-start-pause {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-start-pause.stopped {
+            background: linear-gradient(135deg, #15803d, #22c55e);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-start-pause.running {
+            background: linear-gradient(135deg, #b91c1c, #ef4444);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .hotkey-tag {
+            font-size: 0.7rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .timer-controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fff;
+        }
+
+        /* Footer Info */
+        .footer-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+            padding: 0.5rem;
+        }
+
+        .hotkey-bar {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .hotkey-item kbd {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.15rem 0.4rem;
+            font-family: monospace;
+            color: var(--color-amber);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top App Header -->
+    <header class="app-header">
+        <div class="app-title">
+            <span>BASKETBALL REFEREE CONTROL</span>
+            <span class="badge-5x5">PC 5x5 Official</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <button class="btn" id="swapSidesBtn" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;" onclick="toggleSwapSides()">
+                <span>⇆</span> <span id="swapSidesLabel">SWAP DISPLAY SIDES</span>
+            </button>
+            <div class="status-pill" id="broadcastStatus">
+                <span class="status-dot"></span>
+                <span>Broadcast Active</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main 3-Column Operator Dashboard -->
+    <main class="dashboard-grid">
+
+        <!-- LEFT COLUMN: HOME TEAM -->
+        <section class="card">
+            <div class="card-header">
+                <h2 class="team-title team-home">HOME</h2>
+                <span style="color: var(--color-home); font-weight: 700; font-size: 0.85rem;">TEAM A</span>
+            </div>
+
+            <!-- Score Display & Adjustments -->
+            <div class="score-box">
+                <div class="section-label">SCORE</div>
+                <div class="score-value" id="homeScoreDisplay">0</div>
+                <div class="score-controls">
+                    <button class="btn btn-home" onclick="adjustHomeScore(1)">+1</button>
+                    <button class="btn btn-home" onclick="adjustHomeScore(2)">+2</button>
+                    <button class="btn btn-home" onclick="adjustHomeScore(3)">+3</button>
+                    <button class="btn" onclick="adjustHomeScore(-1)">-1</button>
+                </div>
+            </div>
+
+            <!-- Team Fouls -->
+            <div class="stat-row">
+                <div>
+                    <div class="section-label">TEAM FOULS</div>
+                    <div class="stat-display" id="homeFoulsDisplay" style="color: var(--color-amber);">0</div>
+                </div>
+                <div class="stepper-btns">
+                    <button class="btn btn-step" onclick="adjustHomeFouls(-1)">-</button>
+                    <button class="btn btn-step" onclick="adjustHomeFouls(1)">+</button>
+                </div>
+            </div>
+
+            <!-- Timeouts Left (T.O.L) -->
+            <div>
+                <div class="section-label">TIMEOUTS LEFT (T.O.L)</div>
+                <div class="tol-buttons">
+                    <button class="tol-btn" id="homeTol0" onclick="setHomeTOL(0)">0</button>
+                    <button class="tol-btn" id="homeTol1" onclick="setHomeTOL(1)">1</button>
+                    <button class="tol-btn" id="homeTol2" onclick="setHomeTOL(2)">2</button>
+                    <button class="tol-btn active" id="homeTol3" onclick="setHomeTOL(3)">3</button>
+                </div>
+            </div>
+
+            <!-- Possession Arrow -->
+            <div>
+                <button class="possession-btn" id="homePossessionBtn" onclick="togglePossession('home')">
+                    <span>&#9664; HOME POSSESSION</span>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- CENTER COLUMN: MATCH & TIMERS -->
+        <section class="card center-card">
+            <div class="card-header" style="justify-content: center;">
+                <h2 style="font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; color: var(--text-secondary);">MATCH CONTROL</h2>
+            </div>
+
+            <!-- Period Selector -->
+            <div>
+                <div class="section-label" style="text-align: center;">PERIOD / QUARTER</div>
+                <div class="period-selector">
+                    <button class="period-btn active" id="period1" onclick="setPeriod('1')">Q1</button>
+                    <button class="period-btn" id="period2" onclick="setPeriod('2')">Q2</button>
+                    <button class="period-btn" id="period3" onclick="setPeriod('3')">Q3</button>
+                    <button class="period-btn" id="period4" onclick="setPeriod('4')">Q4</button>
+                    <button class="period-btn" id="periodOT" onclick="setPeriod('OT')">OT</button>
+                </div>
+            </div>
+
+            <!-- Game & Shot Timers Box -->
+            <div class="timer-container">
+                <div class="section-label" style="color: var(--color-green);">GAME CLOCK</div>
+                <div class="game-clock-val" id="gameClockDisplay">10:00</div>
+
+                <div style="margin-top: 1rem;">
+                    <div class="section-label" style="color: var(--color-red);">SHOT CLOCK</div>
+                    <div class="shot-clock-val" id="shotClockDisplay">24</div>
+                </div>
+            </div>
+
+            <!-- Main Timer Controls -->
+            <div>
+                <button class="btn-start-pause stopped" id="startPauseBtn" onclick="toggleTimer()">
+                    <span id="startPauseIcon">&#9654;</span>
+                    <span id="startPauseText">START TIMER</span>
+                    <span class="hotkey-tag">SPACE</span>
+                </button>
+            </div>
+
+            <!-- Game Clock Fine-tuning & Reset -->
+            <div>
+                <div class="section-label">GAME CLOCK CONTROLS (HOLD TO ACCELERATE)</div>
+                <div class="timer-controls-grid">
+                    <button class="btn" onmousedown="startGameClockHold(1)" onmouseup="stopGameClockHold()" onmouseleave="stopGameClockHold()" ontouchstart="startGameClockHold(1)" ontouchend="stopGameClockHold()" ontouchcancel="stopGameClockHold()">+1 SEC</button>
+                    <button class="btn" onmousedown="startGameClockHold(-1)" onmouseup="stopGameClockHold()" onmouseleave="stopGameClockHold()" ontouchstart="startGameClockHold(-1)" ontouchend="stopGameClockHold()" ontouchcancel="stopGameClockHold()">-1 SEC</button>
+                    <button class="btn" style="grid-column: span 2;" onclick="resetGameClock10()">RESET GAME CLOCK (10:00)</button>
+                </div>
+            </div>
+
+            <!-- Shot Clock Quick Actions -->
+            <div>
+                <div class="section-label">SHOT CLOCK CONTROLS</div>
+                <div class="timer-controls-grid">
+                    <button class="btn" onclick="resetShotClock(24)">RESET 24s <span class="hotkey-tag">R</span></button>
+                    <button class="btn" onclick="resetShotClock(14)">RESET 14s <span class="hotkey-tag">F</span></button>
+                    <button class="btn" onclick="adjustShotClock(-1)">-1 SEC SHOT CLOCK</button>
+                    <button class="btn" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border-color: rgba(239, 68, 68, 0.4);" onclick="playStadiumBuzzerSound()">📣 TEST STADIUM BUZZER</button>
+                </div>
+            </div>
+
+            <!-- Clear/Reset Game State -->
+            <div style="margin-top: auto;">
+                <button id="resetAllBtn" class="btn btn-danger" style="width: 100%; padding: 0.85rem;" onclick="clearGameState()">
+                    &#8634; CLEAR / RESET ALL GAME STATE
+                </button>
+            </div>
+        </section>
+
+
+        <!-- RIGHT COLUMN: GUEST TEAM -->
+        <section class="card">
+            <div class="card-header">
+                <h2 class="team-title team-guest">GUEST</h2>
+                <span style="color: var(--color-guest); font-weight: 700; font-size: 0.85rem;">TEAM B</span>
+            </div>
+
+            <!-- Score Display & Adjustments -->
+            <div class="score-box">
+                <div class="section-label">SCORE</div>
+                <div class="score-value" id="guestScoreDisplay">0</div>
+                <div class="score-controls">
+                    <button class="btn btn-guest" onclick="adjustGuestScore(1)">+1</button>
+                    <button class="btn btn-guest" onclick="adjustGuestScore(2)">+2</button>
+                    <button class="btn btn-guest" onclick="adjustGuestScore(3)">+3</button>
+                    <button class="btn" onclick="adjustGuestScore(-1)">-1</button>
+                </div>
+            </div>
+
+            <!-- Team Fouls -->
+            <div class="stat-row">
+                <div>
+                    <div class="section-label">TEAM FOULS</div>
+                    <div class="stat-display" id="guestFoulsDisplay" style="color: var(--color-amber);">0</div>
+                </div>
+                <div class="stepper-btns">
+                    <button class="btn btn-step" onclick="adjustGuestFouls(-1)">-</button>
+                    <button class="btn btn-step" onclick="adjustGuestFouls(1)">+</button>
+                </div>
+            </div>
+
+            <!-- Timeouts Left (T.O.L) -->
+            <div>
+                <div class="section-label">TIMEOUTS LEFT (T.O.L)</div>
+                <div class="tol-buttons">
+                    <button class="tol-btn" id="guestTol0" onclick="setGuestTOL(0)">0</button>
+                    <button class="tol-btn" id="guestTol1" onclick="setGuestTOL(1)">1</button>
+                    <button class="tol-btn" id="guestTol2" onclick="setGuestTOL(2)">2</button>
+                    <button class="tol-btn active" id="guestTol3" onclick="setGuestTOL(3)">3</button>
+                </div>
+            </div>
+
+            <!-- Possession Arrow -->
+            <div>
+                <button class="possession-btn" id="guestPossessionBtn" onclick="togglePossession('guest')">
+                    <span>GUEST POSSESSION &#9654;</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Hotkeys Reference Footer -->
+    <footer class="hotkey-bar">
+        <div class="hotkey-item"><kbd>SPACE</kbd> Start / Pause Timer</div>
+        <div class="hotkey-item"><kbd>R</kbd> Reset Shot Clock 24s</div>
+        <div class="hotkey-item"><kbd>F</kbd> Reset Shot Clock 14s</div>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // Broadcast Channel setup
+        const channel = new BroadcastChannel('basketball_scoreboard');
+
+        // Web Audio API Basketball Referee Whistle Synthesizer
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function unlockAudio() {
+            getAudioContext();
+        }
+        window.addEventListener('click', unlockAudio, { once: true });
+        window.addEventListener('keydown', unlockAudio, { once: true });
+
+        // Sharp Arena Stadium Electric Horn Buzzer (High-power cutting stadium horn tone)
+        function playStadiumBuzzerSound() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+
+                const now = ctx.currentTime;
+                const duration = 1.4;
+
+                // Master gain with instant sharp attack & high volume
+                const masterGain = ctx.createGain();
+                masterGain.gain.setValueAtTime(0.9, now);
+                masterGain.gain.setValueAtTime(0.9, now + duration - 0.15);
+                masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+                // Highpass & High-shelf filters for sharp, crisp cutting harmonics
+                const lowpass = ctx.createBiquadFilter();
+                lowpass.type = 'lowpass';
+                lowpass.frequency.setValueAtTime(4500, now);
+
+                const highShelf = ctx.createBiquadFilter();
+                highShelf.type = 'highshelf';
+                highShelf.frequency.setValueAtTime(1800, now);
+                highShelf.gain.setValueAtTime(8.0, now);
+
+                // Multi-harmonic sharp arena frequencies (220Hz, 330Hz, 440Hz, 660Hz, 880Hz)
+                const frequencies = [220, 330, 440, 660, 880];
+                const gains = [0.4, 0.35, 0.3, 0.25, 0.2];
+
+                frequencies.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(freq, now);
+                    osc.detune.setValueAtTime((idx % 2 === 0 ? 1 : -1) * 12, now);
+
+                    gain.gain.setValueAtTime(gains[idx], now);
+                    osc.connect(gain);
+                    gain.connect(lowpass);
+
+                    osc.start(now);
+                    osc.stop(now + duration);
+                });
+
+                lowpass.connect(highShelf);
+                highShelf.connect(masterGain);
+                masterGain.connect(ctx.destination);
+            } catch(e) {
+                console.error("Stadium buzzer sound error:", e);
+            }
+        }
+
+        // Initial State Definition
+        let gameState = {
+            homeScore: 0,       // 0-199
+            guestScore: 0,      // 0-199
+            homeFouls: 0,       // 0-9
+            guestFouls: 0,      // 0-9
+            homeTOL: 3,         // 0-3
+            guestTOL: 3,        // 0-3
+            period: "1",        // "1", "2", "3", "4", "OT"
+            possession: "none", // "none", "home", "guest"
+            gameSeconds: 600,   // default 600 (10:00)
+            shotSeconds: 24,    // default 24
+            isRunning: false,   // boolean
+            swapSides: false    // swap Home/Guest display sides
+        };
+
+        let timerInterval = null;
+
+        function toggleSwapSides() {
+            gameState.swapSides = !gameState.swapSides;
+            broadcastState();
+        }
+
+        // Save & Broadcast State
+        function broadcastState() {
+            localStorage.setItem('basketball_scoreboard_state', JSON.stringify(gameState));
+            
+            channel.postMessage({
+                type: 'STATE_UPDATE',
+                state: gameState
+            });
+
+            renderConsole();
+        }
+
+        channel.onmessage = function(event) {
+            if (event.data && event.data.type === 'REQUEST_STATE') {
+                broadcastState();
+            }
+        };
+
+        function formatMMSS(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function renderConsole() {
+            // Swap Sides Button State
+            const swapBtn = document.getElementById('swapSidesBtn');
+            const swapLabel = document.getElementById('swapSidesLabel');
+            if (swapBtn && swapLabel) {
+                if (gameState.swapSides) {
+                    swapBtn.style.background = 'rgba(234, 179, 8, 0.25)';
+                    swapBtn.style.borderColor = 'var(--color-amber)';
+                    swapBtn.style.color = 'var(--color-amber)';
+                    swapLabel.textContent = 'DISPLAY SIDES SWAPPED (GUEST | HOME)';
+                } else {
+                    swapBtn.style.background = 'var(--bg-card-hover)';
+                    swapBtn.style.borderColor = 'var(--border-color)';
+                    swapBtn.style.color = 'var(--text-primary)';
+                    swapLabel.textContent = 'SWAP DISPLAY SIDES';
+                }
+            }
+
+            document.getElementById('homeScoreDisplay').textContent = gameState.homeScore;
+            document.getElementById('guestScoreDisplay').textContent = gameState.guestScore;
+
+            const homeFoulElem = document.getElementById('homeFoulsDisplay');
+            const guestFoulElem = document.getElementById('guestFoulsDisplay');
+            if (homeFoulElem) {
+                homeFoulElem.textContent = gameState.homeFouls;
+                homeFoulElem.style.color = gameState.homeFouls > 3 ? '#ef4444' : 'var(--color-amber)';
+                homeFoulElem.style.textShadow = gameState.homeFouls > 3 ? '0 0 12px rgba(239, 68, 68, 0.85)' : 'none';
+            }
+            if (guestFoulElem) {
+                guestFoulElem.textContent = gameState.guestFouls;
+                guestFoulElem.style.color = gameState.guestFouls > 3 ? '#ef4444' : 'var(--color-amber)';
+                guestFoulElem.style.textShadow = gameState.guestFouls > 3 ? '0 0 12px rgba(239, 68, 68, 0.85)' : 'none';
+            }
+
+            [0, 1, 2, 3].forEach(val => {
+                const btn = document.getElementById(`homeTol${val}`);
+                if (btn) {
+                    if (gameState.homeTOL === val) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+
+            [0, 1, 2, 3].forEach(val => {
+                const btn = document.getElementById(`guestTol${val}`);
+                if (btn) {
+                    if (gameState.guestTOL === val) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+
+            const homePoss = document.getElementById('homePossessionBtn');
+            const guestPoss = document.getElementById('guestPossessionBtn');
+            if (gameState.possession === 'home') {
+                homePoss.classList.add('active');
+                guestPoss.classList.remove('active');
+            } else if (gameState.possession === 'guest') {
+                guestPoss.classList.add('active');
+                homePoss.classList.remove('active');
+            } else {
+                homePoss.classList.remove('active');
+                guestPoss.classList.remove('active');
+            }
+
+            ['1', '2', '3', '4', 'OT'].forEach(p => {
+                const pBtn = document.getElementById(`period${p}`);
+                if (pBtn) {
+                    if (gameState.period === p) {
+                        pBtn.classList.add('active');
+                    } else {
+                        pBtn.classList.remove('active');
+                    }
+                }
+            });
+
+            document.getElementById('gameClockDisplay').textContent = formatMMSS(gameState.gameSeconds);
+            document.getElementById('shotClockDisplay').textContent = String(gameState.shotSeconds).padStart(2, '0');
+
+            const startBtn = document.getElementById('startPauseBtn');
+            const icon = document.getElementById('startPauseIcon');
+            const text = document.getElementById('startPauseText');
+            if (gameState.isRunning) {
+                startBtn.className = 'btn-start-pause running';
+                icon.innerHTML = '&#10074;&#10074;';
+                text.textContent = 'PAUSE TIMER';
+            } else {
+                startBtn.className = 'btn-start-pause stopped';
+                icon.innerHTML = '&#9654;';
+                text.textContent = 'START TIMER';
+            }
+        }
+
+        function adjustHomeScore(delta) {
+            gameState.homeScore = Math.max(0, Math.min(199, gameState.homeScore + delta));
+            broadcastState();
+        }
+
+        function adjustGuestScore(delta) {
+            gameState.guestScore = Math.max(0, Math.min(199, gameState.guestScore + delta));
+            broadcastState();
+        }
+
+        function adjustHomeFouls(delta) {
+            gameState.homeFouls = Math.max(0, Math.min(9, gameState.homeFouls + delta));
+            broadcastState();
+        }
+
+        function adjustGuestFouls(delta) {
+            gameState.guestFouls = Math.max(0, Math.min(9, gameState.guestFouls + delta));
+            broadcastState();
+        }
+
+        function setHomeTOL(val) {
+            gameState.homeTOL = val;
+            broadcastState();
+        }
+
+        function setGuestTOL(val) {
+            gameState.guestTOL = val;
+            broadcastState();
+        }
+
+        function togglePossession(team) {
+            if (gameState.possession === team) {
+                gameState.possession = 'none';
+            } else {
+                gameState.possession = team;
+            }
+            broadcastState();
+        }
+
+        function setPeriod(p) {
+            gameState.period = p;
+            broadcastState();
+        }
+
+        function toggleTimer() {
+            gameState.isRunning = !gameState.isRunning;
+            if (gameState.isRunning) {
+                startTimerLoop();
+            } else {
+                stopTimerLoop();
+            }
+            broadcastState();
+        }
+
+        function startTimerLoop() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!gameState.isRunning) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+
+                let stateChanged = false;
+
+                if (gameState.gameSeconds > 0) {
+                    gameState.gameSeconds--;
+                    stateChanged = true;
+                } else {
+                    gameState.isRunning = false;
+                    stopTimerLoop();
+                    stateChanged = true;
+                }
+
+                if (gameState.isRunning) {
+                    if (gameState.shotSeconds > 0) {
+                        gameState.shotSeconds--;
+                        stateChanged = true;
+                        if (gameState.shotSeconds === 0) {
+                            playStadiumBuzzerSound();
+                        }
+                    }
+                    if (gameState.shotSeconds > gameState.gameSeconds) {
+                        gameState.shotSeconds = gameState.gameSeconds;
+                        stateChanged = true;
+                    }
+                }
+
+                if (stateChanged) {
+                    broadcastState();
+                }
+            }, 1000);
+        }
+
+        function stopTimerLoop() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        let holdTimeout = null;
+        let holdInterval = null;
+        let holdStartTime = 0;
+
+        function startGameClockHold(deltaSign) {
+            stopGameClockHold();
+            // Single initial step
+            adjustGameClock(deltaSign);
+
+            holdStartTime = Date.now();
+
+            // Delay before continuous hold acceleration kicks in
+            holdTimeout = setTimeout(() => {
+                holdInterval = setInterval(() => {
+                    const elapsed = Date.now() - holdStartTime;
+
+                    // Acceleration step logic:
+                    // Max speed cap: 60s per 2 real-time seconds (30s per sec).
+                    // Running at 100ms interval (10 ticks/sec), step=3 gives 30s/sec = 60s / 2sec.
+                    let step = 1;
+                    if (elapsed > 2500) {
+                        step = 3; // Maximum speed limit (60 game-seconds per 2 real-time seconds)
+                    } else if (elapsed > 1200) {
+                        step = 2; // Medium speed
+                    } else {
+                        step = 1; // Normal speed
+                    }
+
+                    adjustGameClock(deltaSign * step);
+                }, 100);
+            }, 250);
+        }
+
+        function stopGameClockHold() {
+            if (holdTimeout) {
+                clearTimeout(holdTimeout);
+                holdTimeout = null;
+            }
+            if (holdInterval) {
+                clearInterval(holdInterval);
+                holdInterval = null;
+            }
+        }
+
+        function adjustGameClock(deltaSeconds) {
+            gameState.gameSeconds = Math.max(0, gameState.gameSeconds + deltaSeconds);
+            if (gameState.shotSeconds > gameState.gameSeconds) {
+                gameState.shotSeconds = gameState.gameSeconds;
+            }
+            broadcastState();
+        }
+
+        function resetGameClock10() {
+            gameState.gameSeconds = 600;
+            gameState.shotSeconds = 24;
+            gameState.isRunning = false;
+            stopTimerLoop();
+            broadcastState();
+        }
+
+        function resetShotClock(seconds) {
+            // If remaining game time is less than reset target (e.g. game clock < 24s or < 14s),
+            // reset shot clock to equal the remaining game clock time.
+            if (gameState.gameSeconds < seconds) {
+                gameState.shotSeconds = gameState.gameSeconds;
+            } else {
+                gameState.shotSeconds = seconds;
+            }
+            broadcastState();
+        }
+
+        function adjustShotClock(deltaSeconds) {
+            const nextShot = Math.max(0, gameState.shotSeconds + deltaSeconds);
+            gameState.shotSeconds = Math.min(nextShot, gameState.gameSeconds);
+            broadcastState();
+        }
+
+        let resetConfirmTimeout = null;
+
+        function clearGameState() {
+            const btn = document.getElementById('resetAllBtn');
+            if (btn && btn.dataset.confirming !== "true") {
+                btn.dataset.confirming = "true";
+                btn.innerHTML = "⚠️ CLICK AGAIN TO CONFIRM RESET";
+                btn.style.background = "#b91c1c";
+                btn.style.color = "#ffffff";
+
+                resetConfirmTimeout = setTimeout(() => {
+                    btn.dataset.confirming = "false";
+                    btn.innerHTML = "&#8634; CLEAR / RESET ALL GAME STATE";
+                    btn.style.background = "";
+                    btn.style.color = "";
+                }, 3000);
+                return;
+            }
+
+            if (resetConfirmTimeout) {
+                clearTimeout(resetConfirmTimeout);
+                resetConfirmTimeout = null;
+            }
+
+            if (btn) {
+                btn.dataset.confirming = "false";
+                btn.innerHTML = "&#8634; CLEAR / RESET ALL GAME STATE";
+                btn.style.background = "";
+                btn.style.color = "";
+            }
+
+            gameState = {
+                homeScore: 0,
+                guestScore: 0,
+                homeFouls: 0,
+                guestFouls: 0,
+                homeTOL: 3,
+                guestTOL: 3,
+                period: "1",
+                possession: "none",
+                gameSeconds: 600,
+                shotSeconds: 24,
+                isRunning: false,
+                swapSides: false
+            };
+            stopTimerLoop();
+            broadcastState();
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            if (e.code === 'Space') {
+                e.preventDefault();
+                toggleTimer();
+            } else if (e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                resetShotClock(24);
+            } else if (e.key === 'f' || e.key === 'F') {
+                e.preventDefault();
+                resetShotClock(14);
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('basketball_scoreboard_state');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    gameState = { ...gameState, ...parsed };
+                    gameState.isRunning = false;
+                } catch(e) {
+                    console.error("Failed parsing saved state:", e);
+                }
+            }
+            broadcastState();
+        });
+    </script>
+</body>
+</html>

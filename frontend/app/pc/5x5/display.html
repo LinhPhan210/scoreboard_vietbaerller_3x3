@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5x5 Basketball Stadium LED Scoreboard Display</title>
+    <!-- Crisp, high-contrast digital fonts for 24"/27" monitors -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700;800;900&family=Orbitron:wght@700;800;900&family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #050608;
+            --frame-bg: #0e1014;
+            --frame-border: #1f242d;
+            --panel-bg: #090b0f;
+
+            --color-red: #ff2222;
+            --color-red-glow: rgba(255, 34, 34, 0.45);
+            --color-amber: #ffaa00;
+            --color-amber-glow: rgba(255, 170, 0, 0.45);
+            --color-green: #00ff55;
+            --color-green-glow: rgba(0, 255, 85, 0.45);
+
+            --color-unlit: #181b22;
+            --color-unlit-border: #242934;
+
+            --font-digits: 'Chakra Petch', 'Orbitron', 'Inter', sans-serif;
+            --font-labels: 'Inter', 'Chakra Petch', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-labels);
+            overflow: hidden;
+            padding: 0.5vh 0.5vw;
+        }
+
+        /* Full Screen Scoreboard Casing optimized for 24" & 27" monitors */
+        .scoreboard-casing {
+            background: linear-gradient(145deg, #12151b, #07090c);
+            border: 4px solid var(--frame-border);
+            border-radius: 20px;
+            box-shadow: 
+                0 0 0 2px #020304,
+                0 20px 50px rgba(0, 0, 0, 0.95),
+                inset 0 2px 4px rgba(255, 255, 255, 0.05);
+            width: 98vw;
+            height: 97vh;
+            padding: 1.5vh 1.5vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        /* --- HEADER ROW: TEAMS & PERIOD --- */
+        .row-header {
+            display: grid;
+            grid-template-columns: 0.85fr 1.3fr 0.85fr;
+            align-items: center;
+            text-align: center;
+            height: 14vh;
+        }
+
+        .team-label {
+            font-size: clamp(2.2rem, 4.5vh, 5.5rem);
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+        }
+
+        .team-label.home { text-align: left; padding-left: 0.5vw; }
+        .team-label.guest { text-align: right; padding-right: 0.5vw; }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--panel-bg);
+            border: 2px solid var(--frame-border);
+            border-radius: 16px;
+            padding: 0.8vh 2vw;
+            margin: 0 auto;
+            width: max-content;
+            min-width: 50%;
+            box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.85);
+        }
+
+        .header-period-group {
+            display: flex;
+            align-items: center;
+            gap: 1.5vw;
+        }
+
+        .header-title {
+            font-size: clamp(0.75rem, 1.6vh, 1.6rem);
+            letter-spacing: 2px;
+            color: #828a9a;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .possession-arrow {
+            font-size: clamp(1.8rem, 4vh, 4.5rem);
+            font-family: var(--font-digits);
+            color: var(--color-unlit);
+            transition: all 0.2s ease;
+        }
+
+        .possession-arrow.active {
+            color: var(--color-red);
+            text-shadow: 0 0 12px var(--color-red-glow);
+        }
+
+        .period-digit {
+            font-family: var(--font-digits);
+            font-size: clamp(2.5rem, 5.5vh, 6rem);
+            font-weight: 900;
+            color: var(--color-amber);
+            text-shadow: 0 0 15px var(--color-amber-glow);
+            line-height: 1;
+            min-width: 1.8rem;
+        }
+
+        /* --- MAIN ROW: TEAM SCORES & CENTER CLOCKS (GAME CLOCK + SHOT CLOCK) --- */
+        .row-main {
+            display: grid;
+            grid-template-columns: 0.85fr 1.3fr 0.85fr;
+            gap: 1.5vw;
+            align-items: center;
+            height: 62vh;
+            margin: 0.5vh 0;
+        }
+
+        /* Compact Team Score Boxes */
+        .score-panel {
+            background: var(--panel-bg);
+            border: 2px solid var(--frame-border);
+            border-radius: 18px;
+            padding: 1vh 1vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9);
+        }
+
+        .digit-score {
+            font-family: var(--font-digits);
+            font-size: clamp(6rem, 18vh, 18vw);
+            font-weight: 900;
+            line-height: 0.9;
+            color: var(--color-amber);
+            text-shadow: 0 0 20px var(--color-amber-glow);
+            letter-spacing: 2px;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* CENTER CLOCKS COLUMN - 2 DISTINCT STACKED BOXES */
+        .clocks-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vh;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* TOP BOX: GAME CLOCK BOX */
+        .game-clock-box {
+            background: var(--panel-bg);
+            border: 2px solid var(--frame-border);
+            border-radius: 18px;
+            padding: 1vh 1vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1; /* Slightly smaller box */
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9);
+        }
+
+        .clock-label {
+            font-size: clamp(0.75rem, 1.6vh, 1.6rem);
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #828a9a;
+            text-transform: uppercase;
+        }
+
+        .game-clock-digit {
+            font-family: var(--font-digits);
+            font-size: clamp(3rem, 9.5vh, 9vw);
+            font-weight: 900;
+            color: var(--color-green);
+            text-shadow: 0 0 18px var(--color-green-glow);
+            letter-spacing: 3px;
+            line-height: 1;
+            margin-top: 0.5vh;
+        }
+
+        /* BOTTOM BOX: SHOT CLOCK BOX (SLIGHTLY BIGGER) */
+        .shot-clock-box {
+            background: var(--panel-bg);
+            border: 2px solid var(--frame-border);
+            border-radius: 18px;
+            padding: 1vh 1vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1.35; /* Slightly bigger box than game clock */
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .shot-clock-digit {
+            font-family: var(--font-digits);
+            font-size: clamp(4.5rem, 16vh, 14vw);
+            font-weight: 900;
+            line-height: 0.95;
+            color: var(--color-red);
+            text-shadow: 0 0 30px var(--color-red-glow);
+            letter-spacing: 2px;
+            text-align: center;
+            width: 100%;
+            margin-top: 0.5vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* FULL RED ALERT FLASH WHEN SHOT CLOCK REACHES 0 */
+        .shot-clock-box.expired {
+            background: #cc0000 !important;
+            border-color: #ff3333 !important;
+            box-shadow: 0 0 70px rgba(255, 0, 0, 0.95), inset 0 0 40px rgba(0, 0, 0, 0.4) !important;
+            animation: pulse-red-alert 0.5s infinite alternate;
+        }
+
+        @keyframes pulse-red-alert {
+            from {
+                background-color: #b30000;
+                box-shadow: 0 0 45px rgba(179, 0, 0, 0.8);
+            }
+            to {
+                background-color: #ff1a1a;
+                box-shadow: 0 0 90px rgba(255, 26, 26, 1);
+            }
+        }
+
+        .shot-clock-box.expired .shot-clock-label {
+            color: #ffffff !important;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .shot-clock-box.expired .shot-clock-digit {
+            color: #ffffff !important;
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.9), 0 0 50px rgba(0, 0, 0, 0.6) !important;
+        }
+
+        /* --- LOWER ROW: FOULS & TIMEOUTS LEFT (T.O.L) --- */
+        .row-lower {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5vw;
+            height: 14vh;
+        }
+
+        .stats-panel {
+            background: var(--panel-bg);
+            border: 2px solid var(--frame-border);
+            border-radius: 14px;
+            padding: 1vh 1.5vw;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.85);
+            transition: all 0.3s ease;
+        }
+
+        .stats-panel.bonus {
+            background: #cc0033 !important;
+            border-color: #ff3366 !important;
+            box-shadow: 0 0 35px rgba(255, 0, 68, 0.9), inset 0 0 20px rgba(255, 255, 255, 0.3) !important;
+            animation: pulse-panel-neon 1s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse-panel-neon {
+            from {
+                background-color: #b3002d;
+                box-shadow: 0 0 25px rgba(230, 0, 57, 0.85);
+            }
+            to {
+                background-color: #ff0044;
+                box-shadow: 0 0 45px rgba(255, 0, 68, 1);
+            }
+        }
+
+        .stats-panel.bonus .stat-title {
+            color: #ffffff !important;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+        }
+
+        .stats-panel.bonus .foul-digit {
+            color: #ffffff !important;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.95) !important;
+        }
+
+        .stats-panel.bonus .tol-square.active {
+            background-color: #ffffff !important;
+            border-color: #ffffff !important;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .foul-group {
+            display: flex;
+            align-items: center;
+            gap: 2.2vw;
+            white-space: nowrap;
+        }
+
+        .stat-title {
+            font-size: clamp(1.2rem, 2.8vh, 3.2rem);
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #ffffff;
+        }
+
+        .foul-title {
+            font-size: clamp(1.4rem, 3.4vh, 3.8rem);
+            letter-spacing: 3px;
+        }
+
+        .foul-digit {
+            font-family: var(--font-digits);
+            font-size: clamp(3.2rem, 7.5vh, 8rem);
+            font-weight: 900;
+            color: var(--color-amber);
+            text-shadow: 0 0 15px var(--color-amber-glow);
+            line-height: 1;
+            min-width: 3vw;
+            text-align: center;
+        }
+
+        /* T.O.L Indicators */
+        .tol-indicators {
+            display: flex;
+            gap: 0.6vw;
+        }
+
+        .tol-square {
+            width: clamp(20px, 3vh, 36px);
+            height: clamp(20px, 3vh, 36px);
+            background-color: var(--color-unlit);
+            border: 2px solid var(--color-unlit-border);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .tol-square.active {
+            background-color: var(--color-red);
+            border-color: #ff7777;
+            box-shadow: 0 0 12px var(--color-red-glow);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scoreboard-casing">
+
+        <!-- HEADER ROW: TEAMS & PERIOD -->
+        <div class="row-header">
+            <div class="team-label home">HOME</div>
+            
+            <div class="header-center">
+                <div class="header-period-group">
+                    <span class="possession-arrow" id="homeArrow">&#9664;</span>
+                    <div style="text-align: center;">
+                        <div class="header-title">PERIOD</div>
+                        <div class="period-digit" id="periodDisplay">1</div>
+                    </div>
+                    <span class="possession-arrow" id="guestArrow">&#9654;</span>
+                </div>
+            </div>
+
+            <div class="team-label guest">GUEST</div>
+        </div>
+
+        <!-- MAIN ROW: COMPACT HOME SCORE, CENTER CLOCKS (GAME CLOCK + SHOT CLOCK), COMPACT GUEST SCORE -->
+        <div class="row-main">
+            <!-- HOME SCORE -->
+            <div class="score-panel">
+                <div class="digit-score" id="homeScore">00</div>
+            </div>
+
+            <!-- CENTER CLOCKS COLUMN (2 SEPARATE BOXES V-STACKED) -->
+            <div class="clocks-column">
+                <!-- TOP BOX: GAME CLOCK BOX -->
+                <div class="game-clock-box">
+                    <div class="clock-label">GAME CLOCK</div>
+                    <div class="game-clock-digit" id="gameClock">10:00</div>
+                </div>
+
+                <!-- BOTTOM BOX: SHOT CLOCK BOX (SLIGHTLY BIGGER) -->
+                <div class="shot-clock-box" id="shotClockBox">
+                    <div class="clock-label">SHOT CLOCK</div>
+                    <div class="shot-clock-digit" id="shotClock">24</div>
+                </div>
+            </div>
+
+            <!-- GUEST SCORE -->
+            <div class="score-panel">
+                <div class="digit-score" id="guestScore">00</div>
+            </div>
+        </div>
+
+        <!-- LOWER ROW: FOULS & TIMEOUTS LEFT (T.O.L) -->
+        <div class="row-lower">
+            <!-- HOME FOULS & TOL PANEL -->
+            <div class="stats-panel" id="homeStatsPanel">
+                <div class="stat-group foul-group">
+                    <span class="stat-title foul-title">FOULS</span>
+                    <span class="foul-digit" id="homeFouls">0</span>
+                </div>
+                <div class="stat-group">
+                    <span class="stat-title" style="font-size: clamp(0.9rem, 2vh, 2.2rem); color: #828a9a;">T.O.L</span>
+                    <div class="tol-indicators">
+                        <div class="tol-square active" id="homeTol1"></div>
+                        <div class="tol-square active" id="homeTol2"></div>
+                        <div class="tol-square active" id="homeTol3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GUEST / RIGHT STATS PANEL (SYMMETRICAL: T.O.L LEFT, FOULS RIGHT) -->
+            <div class="stats-panel" id="guestStatsPanel">
+                <div class="stat-group">
+                    <span class="stat-title" style="font-size: clamp(0.9rem, 2vh, 2.2rem); color: #828a9a;">T.O.L</span>
+                    <div class="tol-indicators">
+                        <div class="tol-square active" id="guestTol1"></div>
+                        <div class="tol-square active" id="guestTol2"></div>
+                        <div class="tol-square active" id="guestTol3"></div>
+                    </div>
+                </div>
+                <div class="stat-group foul-group">
+                    <span class="stat-title foul-title">FOULS</span>
+                    <span class="foul-digit" id="guestFouls">0</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Receiver, Synchronizer & Audio Buzzer Script -->
+    <script>
+        const channel = new BroadcastChannel('basketball_scoreboard');
+
+        // Web Audio API Stadium Horn Buzzer Sound (Plays in foreground & background tabs)
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playBuzzerSound() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+
+                const osc1 = ctx.createOscillator();
+                const osc2 = ctx.createOscillator();
+                const osc3 = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                osc1.type = 'sawtooth';
+                osc2.type = 'square';
+                osc3.type = 'sawtooth';
+
+                // Loud stadium horn fundamentals & harmonics
+                osc1.frequency.setValueAtTime(215, ctx.currentTime);
+                osc2.frequency.setValueAtTime(270, ctx.currentTime);
+                osc3.frequency.setValueAtTime(430, ctx.currentTime);
+
+                gainNode.gain.setValueAtTime(0.7, ctx.currentTime);
+                gainNode.gain.setValueAtTime(0.7, ctx.currentTime + 1.4);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.8);
+
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+                osc3.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                osc1.start(ctx.currentTime);
+                osc2.start(ctx.currentTime);
+                osc3.start(ctx.currentTime);
+                osc1.stop(ctx.currentTime + 1.8);
+                osc2.stop(ctx.currentTime + 1.8);
+                osc3.stop(ctx.currentTime + 1.8);
+            } catch(e) {
+                console.error("Audio buzzer error:", e);
+            }
+        }
+
+        // Unlock AudioContext automatically on user interaction
+        function unlockAudio() {
+            getAudioContext();
+        }
+        window.addEventListener('click', unlockAudio, { once: true });
+        window.addEventListener('keydown', unlockAudio, { once: true });
+
+        function formatScore(val) {
+            const num = Number(val) || 0;
+            if (num < 100) {
+                return String(num).padStart(2, '0');
+            }
+            return String(num);
+        }
+
+        function format2Digit(val) {
+            return String(val).padStart(2, '0');
+        }
+
+        function formatMMSS(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        let previousShotSeconds = null;
+
+        function renderScoreboard(state) {
+            if (!state) return;
+            currentState = { ...currentState, ...state };
+
+            const currentShotSec = state.shotSeconds ?? 24;
+            const shotClockBox = document.getElementById('shotClockBox');
+
+            // Trigger Full Red Box styling when shot clock hits 0
+            if (currentShotSec === 0) {
+                shotClockBox.classList.add('expired');
+            } else {
+                shotClockBox.classList.remove('expired');
+            }
+            previousShotSeconds = currentShotSec;
+
+            const isSwapped = !!state.swapSides;
+
+            // Team Labels in Header
+            const homeLabel = document.querySelector('.team-label.home');
+            const guestLabel = document.querySelector('.team-label.guest');
+            if (homeLabel && guestLabel) {
+                homeLabel.textContent = isSwapped ? "GUEST" : "HOME";
+                guestLabel.textContent = isSwapped ? "HOME" : "GUEST";
+            }
+
+            // Scores
+            const leftScore = isSwapped ? (state.guestScore ?? 0) : (state.homeScore ?? 0);
+            const rightScore = isSwapped ? (state.homeScore ?? 0) : (state.guestScore ?? 0);
+            document.getElementById('homeScore').textContent = formatScore(leftScore);
+            document.getElementById('guestScore').textContent = formatScore(rightScore);
+
+            // Period & Game Clock in Header
+            document.getElementById('periodDisplay').textContent = state.period ?? "1";
+            document.getElementById('gameClock').textContent = formatMMSS(state.gameSeconds ?? 600);
+
+            // Possession Arrows
+            const leftPossession = isSwapped ? (state.possession === 'guest') : (state.possession === 'home');
+            const rightPossession = isSwapped ? (state.possession === 'home') : (state.possession === 'guest');
+
+            const homeArrow = document.getElementById('homeArrow');
+            const guestArrow = document.getElementById('guestArrow');
+            if (leftPossession) {
+                homeArrow.classList.add('active');
+                guestArrow.classList.remove('active');
+            } else if (rightPossession) {
+                guestArrow.classList.add('active');
+                homeArrow.classList.remove('active');
+            } else {
+                homeArrow.classList.remove('active');
+                guestArrow.classList.remove('active');
+            }
+
+            // Shot Clock Digits
+            document.getElementById('shotClock').textContent = format2Digit(currentShotSec);
+
+            // Fouls
+            const leftFouls = isSwapped ? (state.guestFouls ?? 0) : (state.homeFouls ?? 0);
+            const rightFouls = isSwapped ? (state.homeFouls ?? 0) : (state.guestFouls ?? 0);
+            document.getElementById('homeFouls').textContent = leftFouls;
+            document.getElementById('guestFouls').textContent = rightFouls;
+
+            // Highlight Whole Stats Panel (Fouls & T.O.L) with Neon Red when Team Fouls > 3
+            const homeStatsPanel = document.getElementById('homeStatsPanel');
+            const guestStatsPanel = document.getElementById('guestStatsPanel');
+            if (homeStatsPanel) {
+                if (leftFouls > 3) homeStatsPanel.classList.add('bonus');
+                else homeStatsPanel.classList.remove('bonus');
+            }
+            if (guestStatsPanel) {
+                if (rightFouls > 3) guestStatsPanel.classList.add('bonus');
+                else guestStatsPanel.classList.remove('bonus');
+            }
+
+            // Timeouts Left (T.O.L)
+            const leftTol = isSwapped ? (state.guestTOL ?? 3) : (state.homeTOL ?? 3);
+            const rightTol = isSwapped ? (state.homeTOL ?? 3) : (state.guestTOL ?? 3);
+
+            document.getElementById('homeTol1').className = leftTol >= 1 ? 'tol-square active' : 'tol-square';
+            document.getElementById('homeTol2').className = leftTol >= 2 ? 'tol-square active' : 'tol-square';
+            document.getElementById('homeTol3').className = leftTol >= 3 ? 'tol-square active' : 'tol-square';
+
+            document.getElementById('guestTol1').className = rightTol >= 1 ? 'tol-square active' : 'tol-square';
+            document.getElementById('guestTol2').className = rightTol >= 2 ? 'tol-square active' : 'tol-square';
+            document.getElementById('guestTol3').className = rightTol >= 3 ? 'tol-square active' : 'tol-square';
+        }
+
+        let currentState = {
+            homeScore: 0,
+            guestScore: 0,
+            period: "1",
+            gameSeconds: 600,
+            shotSeconds: 24,
+            homeFouls: 0,
+            guestFouls: 0,
+            homeTOL: 3,
+            guestTOL: 3,
+            possession: 'none',
+            isRunning: false,
+            swapSides: false
+        };
+
+        channel.onmessage = function(event) {
+            if (event.data && event.data.type === 'STATE_UPDATE') {
+                renderScoreboard(event.data.state);
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            getAudioContext();
+            const saved = localStorage.getItem('basketball_scoreboard_state');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    currentState = { ...currentState, ...parsed };
+                    renderScoreboard(currentState);
+                } catch(e) {
+                    console.error("Error reading saved state:", e);
+                }
+            }
+
+            channel.postMessage({ type: 'REQUEST_STATE' });
+        });
+    </script>
+</body>
+</html>
+
