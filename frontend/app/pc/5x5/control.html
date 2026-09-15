@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Chakra+Petch:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg-main: #0b0f19;
@@ -581,7 +582,8 @@
                 <div class="timer-controls-grid">
                     <button class="btn" onmousedown="startGameClockHold(1)" onmouseup="stopGameClockHold()" onmouseleave="stopGameClockHold()" ontouchstart="startGameClockHold(1)" ontouchend="stopGameClockHold()" ontouchcancel="stopGameClockHold()">+1 SEC</button>
                     <button class="btn" onmousedown="startGameClockHold(-1)" onmouseup="stopGameClockHold()" onmouseleave="stopGameClockHold()" ontouchstart="startGameClockHold(-1)" ontouchend="stopGameClockHold()" ontouchcancel="stopGameClockHold()">-1 SEC</button>
-                    <button class="btn" style="grid-column: span 2;" onclick="resetGameClock10()">RESET GAME CLOCK (10:00)</button>
+                    <button class="btn" onclick="resetGameClock10()">RESET GAME CLOCK (10:00)</button>
+                    <button class="btn" onclick="nextPeriod()">NEXT PERIOD &#10145;</button>
                 </div>
             </div>
 
@@ -655,6 +657,58 @@
             </div>
         </section>
     </main>
+
+    <!-- SCORE ANALYTICS & LEAD TRACKER PANEL -->
+    <section class="card" style="margin-top: 1rem;">
+        <div class="card-header" style="justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                    <span>📈</span> MATCH LEAD TRACKER & SCORE LOG
+                </h2>
+                <span id="leadSummaryBadge" style="background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); padding: 0.25rem 0.65rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">
+                    TIED GAME (0 PTS DIFF)
+                </span>
+            </div>
+            <button class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3);" onclick="clearScoreLog()">
+                🗑️ CLEAR LOG HISTORY
+            </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 1rem; margin-top: 1rem;">
+            <!-- LEAD DIFFERENTIAL GRAPH -->
+            <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; min-height: 280px;">
+                <div class="section-label" style="margin-bottom: 0.75rem;">POINTS LEAD DIFFERENTIAL BY GAME MINUTE</div>
+                <div style="flex: 1; position: relative; width: 100%; min-height: 220px;">
+                    <canvas id="leadChartCanvas"></canvas>
+                </div>
+            </div>
+
+            <!-- SCORE EVENT HISTORY LOG -->
+            <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; max-height: 320px;">
+                <div class="section-label" style="margin-bottom: 0.75rem;">REAL-TIME SCORE CHANGE LOG</div>
+                <div style="overflow-y: auto; flex: 1; padding-right: 0.25rem;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
+                        <thead>
+                            <tr style="color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                <th style="padding: 0.4rem 0.2rem;">CLOCK</th>
+                                <th style="padding: 0.4rem 0.2rem;">TEAM</th>
+                                <th style="padding: 0.4rem 0.2rem;">PTS</th>
+                                <th style="padding: 0.4rem 0.2rem;">SCORE</th>
+                                <th style="padding: 0.4rem 0.2rem;">LEAD</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scoreLogTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">
+                                    No score events logged yet. Adjust score to begin tracking.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Hotkeys Reference Footer -->
     <footer class="hotkey-bar">
@@ -753,7 +807,8 @@
             gameSeconds: 600,   // default 600 (10:00)
             shotSeconds: 24,    // default 24
             isRunning: false,   // boolean
-            swapSides: false    // swap Home/Guest display sides
+            swapSides: false,   // swap Home/Guest display sides
+            scoreLog: []        // history log of score changes
         };
 
         let timerInterval = null;
@@ -883,16 +938,462 @@
                 icon.innerHTML = '&#9654;';
                 text.textContent = 'START TIMER';
             }
+
+            renderScoreLogAndChart();
+        }
+
+        function getElapsedSeconds(period, gameSeconds) {
+            let base = 0;
+            if (period === '1') base = 0;
+            else if (period === '2') base = 600;
+            else if (period === '3') base = 1200;
+            else if (period === '4') base = 1800;
+            else if (period === 'OT') base = 2400;
+
+            const periodDuration = (period === 'OT') ? 300 : 600;
+            const elapsedInPeriod = Math.max(0, periodDuration - (gameSeconds || 0));
+            return base + elapsedInPeriod;
+        }
+
+        function formatElapsedToPeriodClock(elapsedSec) {
+            if (elapsedSec <= 0) return 'Q1 10:00';
+            if (elapsedSec <= 600) {
+                const remaining = Math.max(0, 600 - elapsedSec);
+                return `Q1 ${formatMMSS(remaining)}`;
+            } else if (elapsedSec <= 1200) {
+                const remaining = Math.max(0, 1200 - elapsedSec);
+                return `Q2 ${formatMMSS(remaining)}`;
+            } else if (elapsedSec <= 1800) {
+                const remaining = Math.max(0, 1800 - elapsedSec);
+                return `Q3 ${formatMMSS(remaining)}`;
+            } else if (elapsedSec <= 2400) {
+                const remaining = Math.max(0, 2400 - elapsedSec);
+                return `Q4 ${formatMMSS(remaining)}`;
+            } else {
+                const otElapsed = elapsedSec - 2400;
+                const remaining = Math.max(0, 300 - otElapsed);
+                return `OT ${formatMMSS(remaining)}`;
+            }
+        }
+
+        function recordScoreEvent(team, delta, homeScore, guestScore) {
+            if (!gameState.scoreLog) gameState.scoreLog = [];
+
+            const isSwapped = !!gameState.swapSides;
+            let teamName = team;
+            if (team === 'HOME') {
+                teamName = isSwapped ? 'HOME (GUEST SIDE)' : 'HOME';
+            } else {
+                teamName = isSwapped ? 'GUEST (HOME SIDE)' : 'GUEST';
+            }
+
+            const diff = homeScore - guestScore;
+            const period = gameState.period || "1";
+            const gameClock = formatMMSS(gameState.gameSeconds);
+            const elapsedSec = getElapsedSeconds(period, gameState.gameSeconds);
+
+            const event = {
+                id: Date.now() + Math.random(),
+                period: period,
+                gameClock: gameClock,
+                gameSeconds: gameState.gameSeconds,
+                elapsedSeconds: elapsedSec,
+                team: team,
+                teamName: teamName,
+                delta: delta,
+                homeScore: homeScore,
+                guestScore: guestScore,
+                diff: diff,
+                timeStr: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            };
+
+            gameState.scoreLog.push(event);
+            broadcastState();
         }
 
         function adjustHomeScore(delta) {
+            const prevScore = gameState.homeScore;
             gameState.homeScore = Math.max(0, Math.min(199, gameState.homeScore + delta));
-            broadcastState();
+            if (gameState.homeScore !== prevScore) {
+                recordScoreEvent('HOME', delta, gameState.homeScore, gameState.guestScore);
+            } else {
+                broadcastState();
+            }
         }
 
         function adjustGuestScore(delta) {
+            const prevScore = gameState.guestScore;
             gameState.guestScore = Math.max(0, Math.min(199, gameState.guestScore + delta));
-            broadcastState();
+            if (gameState.guestScore !== prevScore) {
+                recordScoreEvent('GUEST', delta, gameState.homeScore, gameState.guestScore);
+            } else {
+                broadcastState();
+            }
+        }
+
+        function clearScoreLog() {
+            if (confirm("Are you sure you want to clear the score event history log?")) {
+                gameState.scoreLog = [];
+                broadcastState();
+            }
+        }
+
+        let leadChartInstance = null;
+
+        function renderScoreLogAndChart() {
+            const logList = gameState.scoreLog || [];
+            const tbody = document.getElementById('scoreLogTableBody');
+            const summaryBadge = document.getElementById('leadSummaryBadge');
+
+            const currentHome = gameState.homeScore || 0;
+            const currentGuest = gameState.guestScore || 0;
+            const currentDiff = currentHome - currentGuest;
+
+            if (summaryBadge) {
+                if (currentDiff > 0) {
+                    summaryBadge.textContent = `HOME LEADS BY +${currentDiff} PTS`;
+                    summaryBadge.style.background = 'rgba(59, 130, 246, 0.25)';
+                    summaryBadge.style.color = '#60a5fa';
+                    summaryBadge.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+                } else if (currentDiff < 0) {
+                    summaryBadge.textContent = `GUEST LEADS BY +${Math.abs(currentDiff)} PTS`;
+                    summaryBadge.style.background = 'rgba(249, 115, 22, 0.25)';
+                    summaryBadge.style.color = '#fb923c';
+                    summaryBadge.style.borderColor = 'rgba(249, 115, 22, 0.4)';
+                } else {
+                    summaryBadge.textContent = 'TIED GAME (0 PTS DIFF)';
+                    summaryBadge.style.background = 'rgba(148, 163, 184, 0.2)';
+                    summaryBadge.style.color = '#94a3b8';
+                    summaryBadge.style.borderColor = 'rgba(148, 163, 184, 0.3)';
+                }
+            }
+
+            if (tbody) {
+                if (logList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">No score events logged yet. Adjust score to begin tracking.</td></tr>`;
+                } else {
+                    let html = '';
+                    const reversed = [...logList].reverse();
+                    reversed.forEach(item => {
+                        const isHome = item.team === 'HOME';
+                        const teamColor = isHome ? '#60a5fa' : '#fb923c';
+                        const deltaStr = item.delta > 0 ? `+${item.delta}` : `${item.delta}`;
+                        const deltaColor = item.delta > 0 ? '#22c55e' : '#ef4444';
+
+                        let leadTag = '';
+                        if (item.diff > 0) {
+                            leadTag = `<span style="color: #60a5fa; font-weight: 700;">HOME +${item.diff}</span>`;
+                        } else if (item.diff < 0) {
+                            leadTag = `<span style="color: #fb923c; font-weight: 700;">GUEST +${Math.abs(item.diff)}</span>`;
+                        } else {
+                            leadTag = `<span style="color: #94a3b8; font-weight: 700;">TIED</span>`;
+                        }
+
+                        html += `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 0.4rem 0.2rem; font-weight: 600;">Q${item.period} ${item.gameClock}</td>
+                            <td style="padding: 0.4rem 0.2rem; color: ${teamColor}; font-weight: 700;">${item.team}</td>
+                            <td style="padding: 0.4rem 0.2rem; color: ${deltaColor}; font-weight: 800;">${deltaStr}</td>
+                            <td style="padding: 0.4rem 0.2rem; font-family: var(--font-display);">${item.homeScore} - ${item.guestScore}</td>
+                            <td style="padding: 0.4rem 0.2rem;">${leadTag}</td>
+                        </tr>`;
+                    });
+                    tbody.innerHTML = html;
+                }
+            }
+
+            renderLeadChart(logList);
+        }
+
+        function renderLeadChart(logList) {
+            const canvas = document.getElementById('leadChartCanvas');
+            if (!canvas) return;
+
+            const currentElapsed = getElapsedSeconds(gameState.period || '1', gameState.gameSeconds || 0);
+
+            // Start point at Q1 10:00 (Elapsed 0s, Diff 0)
+            const rawDataPoints = [{
+                x: 0,
+                y: 0,
+                period: '1',
+                gameClock: '10:00',
+                homeScore: 0,
+                guestScore: 0,
+                label: 'Q1 10:00 (Start)'
+            }];
+
+            logList.forEach(entry => {
+                const elapsed = entry.elapsedSeconds ?? getElapsedSeconds(entry.period, entry.gameSeconds || 0);
+                rawDataPoints.push({
+                    x: elapsed,
+                    y: entry.diff,
+                    period: entry.period,
+                    gameClock: entry.gameClock,
+                    homeScore: entry.homeScore,
+                    guestScore: entry.guestScore,
+                    team: entry.team,
+                    delta: entry.delta,
+                    label: `Q${entry.period} ${entry.gameClock}`
+                });
+            });
+
+            // Append current time point so the active lead block extends continuously to NOW
+            const lastPt = rawDataPoints[rawDataPoints.length - 1];
+            if (currentElapsed > lastPt.x) {
+                rawDataPoints.push({
+                    x: currentElapsed,
+                    y: lastPt.y,
+                    period: gameState.period || '1',
+                    gameClock: formatMMSS(gameState.gameSeconds),
+                    homeScore: lastPt.homeScore,
+                    guestScore: lastPt.guestScore,
+                    label: `Q${gameState.period || '1'} ${formatMMSS(gameState.gameSeconds)} (Now)`
+                });
+            }
+
+            const maxElapsedInLog = rawDataPoints.reduce((max, pt) => Math.max(max, pt.x), 0);
+            let maxScaleX = 600;
+            if (maxElapsedInLog > 600) {
+                maxScaleX = Math.ceil(maxElapsedInLog / 300) * 300;
+            }
+
+            if (typeof Chart !== 'undefined') {
+                if (leadChartInstance) {
+                    leadChartInstance.destroy();
+                    leadChartInstance = null;
+                }
+
+                const leadColumnsPlugin = {
+                    id: 'leadColumnsPlugin',
+                    beforeDatasetsDraw(chart) {
+                        const { ctx, scales } = chart;
+                        if (!scales.x || !scales.y) return;
+
+                        const xScale = scales.x;
+                        const yScale = scales.y;
+                        const zeroY = yScale.getPixelForValue(0);
+
+                        const points = chart.data.datasets[0].data || [];
+                        if (points.length < 2) return;
+
+                        ctx.save();
+                        for (let i = 0; i < points.length - 1; i++) {
+                            const p1 = points[i];
+                            const p2 = points[i + 1];
+
+                            const x1 = xScale.getPixelForValue(p1.x);
+                            const x2 = xScale.getPixelForValue(p2.x);
+                            const width = x2 - x1;
+
+                            if (width <= 0) continue;
+
+                            const yVal = p1.y; // Lead value after last score
+                            if (yVal === 0) continue;
+
+                            const yPixel = yScale.getPixelForValue(yVal);
+                            const rectY = Math.min(zeroY, yPixel);
+                            const rectHeight = Math.abs(zeroY - yPixel);
+
+                            if (yVal > 0) { // Home lead block
+                                ctx.fillStyle = 'rgba(59, 130, 246, 0.45)';
+                                ctx.strokeStyle = '#3b82f6';
+                            } else { // Guest lead block
+                                ctx.fillStyle = 'rgba(249, 115, 22, 0.45)';
+                                ctx.strokeStyle = '#f97316';
+                            }
+
+                            ctx.lineWidth = 2;
+                            ctx.fillRect(x1, rectY, width, rectHeight);
+                            ctx.strokeRect(x1, rectY, width, rectHeight);
+                        }
+                        ctx.restore();
+                    }
+                };
+
+                const ctx = canvas.getContext('2d');
+                leadChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            label: 'Score Differential',
+                            data: rawDataPoints,
+                            showLine: false,
+                            fill: false,
+                            pointBorderColor: function(context) {
+                                const raw = context.raw;
+                                if (!raw) return '#94a3b8';
+                                if (raw.team === 'HOME') return '#3b82f6';
+                                if (raw.team === 'GUEST') return '#f97316';
+                                return '#94a3b8';
+                            },
+                            pointBackgroundColor: function(context) {
+                                const raw = context.raw;
+                                if (!raw) return '#94a3b8';
+                                if (raw.team === 'HOME') return '#3b82f6';
+                                if (raw.team === 'GUEST') return '#f97316';
+                                return '#94a3b8';
+                            },
+                            pointRadius: 5,
+                            pointHoverRadius: 8
+                        }]
+                    },
+                    plugins: [leadColumnsPlugin],
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: '#0f172a',
+                                    titleColor: '#f8fafc',
+                                    bodyColor: '#cbd5e1',
+                                    borderColor: '#334155',
+                                    borderWidth: 1,
+                                    callbacks: {
+                                        title: function(context) {
+                                            const raw = context[0].raw;
+                                            return raw ? `Time: Q${raw.period} ${raw.gameClock}` : '';
+                                        },
+                                        label: function(context) {
+                                            const raw = context.raw;
+                                            if (!raw) return '';
+                                            const diff = raw.y;
+                                            let leadStr = 'Game Tied (0 pts diff)';
+                                            if (diff > 0) leadStr = `HOME leads by +${diff} pts`;
+                                            if (diff < 0) leadStr = `GUEST leads by +${Math.abs(diff)} pts`;
+                                            return ` Score: ${raw.homeScore} - ${raw.guestScore} (${leadStr})`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    grid: { color: 'rgba(255, 255, 255, 0.08)' },
+                                    ticks: {
+                                        color: '#94a3b8',
+                                        callback: function(val) {
+                                            if (val > 0) return `+${val} HOME`;
+                                            if (val < 0) return `+${Math.abs(val)} GUEST`;
+                                            return `0 TIED`;
+                                        }
+                                    }
+                                },
+                                x: {
+                                    type: 'linear',
+                                    min: 0,
+                                    max: maxScaleX,
+                                    grid: { color: 'rgba(255, 255, 255, 0.08)' },
+                                    ticks: {
+                                        stepSize: 150, // Checkpoints every 2:30
+                                        color: '#94a3b8',
+                                        font: { size: 11, weight: '600' },
+                                        callback: function(val) {
+                                            return formatElapsedToPeriodClock(val);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+            } else {
+                drawCanvasFallback(canvas, chartDataPoints, maxScaleX);
+            }
+        }
+
+        function drawCanvasFallback(canvas, points, maxScaleX) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.clientWidth || 400;
+            const height = canvas.clientHeight || 220;
+            canvas.width = width;
+            canvas.height = height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const padL = 65, padR = 25, padT = 20, padB = 35;
+            const graphW = width - padL - padR;
+            const graphH = height - padT - padB;
+
+            const yValues = points.map(p => p.y);
+            let maxVal = Math.max(5, ...yValues.map(Math.abs));
+            const zeroY = padT + graphH / 2;
+
+            // Horizontal Zero Baseline
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(padL, zeroY);
+            ctx.lineTo(width - padR, zeroY);
+            ctx.stroke();
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '11px sans-serif';
+            ctx.fillText('0 TIED', 10, zeroY + 4);
+
+            // Vertical Checkpoint Grid Lines every 150s (2:30)
+            const step = 150;
+            for (let t = 0; t <= maxScaleX; t += step) {
+                const x = padL + (t / maxScaleX) * graphW;
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.beginPath();
+                ctx.moveTo(x, padT);
+                ctx.lineTo(x, height - padB);
+                ctx.stroke();
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                const label = formatElapsedToPeriodClock(t);
+                ctx.fillText(label, x, height - 10);
+            }
+
+            if (points.length < 2) {
+                ctx.fillStyle = '#64748b';
+                ctx.font = '13px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Waiting for score changes to map chart...', width / 2, height / 2);
+                return;
+            }
+
+            // Draw Continuous Step Columns/Blocks from T_i to T_i+1
+            for (let i = 0; i < points.length - 1; i++) {
+                const p1 = points[i];
+                const p2 = points[i + 1];
+
+                const x1 = padL + (p1.x / maxScaleX) * graphW;
+                const x2 = padL + (p2.x / maxScaleX) * graphW;
+                const blockW = x2 - x1;
+
+                if (blockW <= 0) continue;
+
+                const ratio = p1.y / (maxVal * 2);
+                const y = zeroY - ratio * graphH;
+                const blockH = zeroY - y;
+
+                if (p1.y > 0) { // Home lead block
+                    ctx.fillStyle = 'rgba(59, 130, 246, 0.45)';
+                    ctx.fillRect(x1, zeroY - blockH, blockW, blockH);
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x1, zeroY - blockH, blockW, blockH);
+                } else if (p1.y < 0) { // Guest lead block
+                    ctx.fillStyle = 'rgba(249, 115, 22, 0.45)';
+                    ctx.fillRect(x1, zeroY, blockW, Math.abs(blockH));
+                    ctx.strokeStyle = '#f97316';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x1, zeroY, blockW, Math.abs(blockH));
+                }
+
+                if (!p1.isTransitionPoint) {
+                    // Draw event marker dot at start of block
+                    ctx.beginPath();
+                    ctx.arc(x1, y, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = p1.team === 'HOME' ? '#3b82f6' : (p1.team === 'GUEST' ? '#f97316' : '#94a3b8');
+                    ctx.fill();
+                    ctx.strokeStyle = '#0f172a';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+            }
         }
 
         function adjustHomeFouls(delta) {
@@ -1047,6 +1548,21 @@
             broadcastState();
         }
 
+        function nextPeriod() {
+            const periods = ['1', '2', '3', '4', 'OT'];
+            const idx = periods.indexOf(gameState.period);
+            if (idx >= 0 && idx < periods.length - 1) {
+                gameState.period = periods[idx + 1];
+            } else {
+                gameState.period = 'OT';
+            }
+            gameState.gameSeconds = 600;
+            gameState.shotSeconds = 24;
+            gameState.isRunning = false;
+            stopTimerLoop();
+            broadcastState();
+        }
+
         function resetShotClock(seconds) {
             // If remaining game time is less than reset target (e.g. game clock < 24s or < 14s),
             // reset shot clock to equal the remaining game clock time.
@@ -1107,8 +1623,13 @@
                 gameSeconds: 600,
                 shotSeconds: 24,
                 isRunning: false,
-                swapSides: false
+                swapSides: false,
+                scoreLog: []
             };
+            if (leadChartInstance) {
+                leadChartInstance.destroy();
+                leadChartInstance = null;
+            }
             stopTimerLoop();
             broadcastState();
         }
