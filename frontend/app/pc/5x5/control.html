@@ -782,8 +782,9 @@
         };
 
         function formatMMSS(totalSeconds) {
-            const minutes = Math.floor(totalSeconds / 60);
-            const seconds = totalSeconds % 60;
+            const sec = Math.max(0, Math.ceil(totalSeconds));
+            const minutes = Math.floor(sec / 60);
+            const seconds = sec % 60;
             return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
@@ -868,7 +869,7 @@
             });
 
             document.getElementById('gameClockDisplay').textContent = formatMMSS(gameState.gameSeconds);
-            document.getElementById('shotClockDisplay').textContent = String(gameState.shotSeconds).padStart(2, '0');
+            document.getElementById('shotClockDisplay').textContent = String(Math.max(0, Math.ceil(gameState.shotSeconds))).padStart(2, '0');
 
             const startBtn = document.getElementById('startPauseBtn');
             const icon = document.getElementById('startPauseIcon');
@@ -949,9 +950,10 @@
                 let stateChanged = false;
 
                 if (gameState.gameSeconds > 0) {
-                    gameState.gameSeconds--;
+                    gameState.gameSeconds = Math.max(0, Math.round((gameState.gameSeconds - 0.1) * 10) / 10);
                     stateChanged = true;
                 } else {
+                    gameState.gameSeconds = 0;
                     gameState.isRunning = false;
                     stopTimerLoop();
                     stateChanged = true;
@@ -959,9 +961,10 @@
 
                 if (gameState.isRunning) {
                     if (gameState.shotSeconds > 0) {
-                        gameState.shotSeconds--;
+                        const prevShot = gameState.shotSeconds;
+                        gameState.shotSeconds = Math.max(0, Math.round((gameState.shotSeconds - 0.1) * 10) / 10);
                         stateChanged = true;
-                        if (gameState.shotSeconds === 0) {
+                        if (gameState.shotSeconds === 0 && prevShot > 0) {
                             playStadiumBuzzerSound();
                         }
                     }
@@ -974,7 +977,7 @@
                 if (stateChanged) {
                     broadcastState();
                 }
-            }, 1000);
+            }, 100);
         }
 
         function stopTimerLoop() {
@@ -1029,7 +1032,7 @@
         }
 
         function adjustGameClock(deltaSeconds) {
-            gameState.gameSeconds = Math.max(0, gameState.gameSeconds + deltaSeconds);
+            gameState.gameSeconds = Math.max(0, Math.round((gameState.gameSeconds + deltaSeconds) * 10) / 10);
             if (gameState.shotSeconds > gameState.gameSeconds) {
                 gameState.shotSeconds = gameState.gameSeconds;
             }
@@ -1056,7 +1059,7 @@
         }
 
         function adjustShotClock(deltaSeconds) {
-            const nextShot = Math.max(0, gameState.shotSeconds + deltaSeconds);
+            const nextShot = Math.max(0, Math.round((gameState.shotSeconds + deltaSeconds) * 10) / 10);
             gameState.shotSeconds = Math.min(nextShot, gameState.gameSeconds);
             broadcastState();
         }
