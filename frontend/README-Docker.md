@@ -41,9 +41,10 @@ docker-compose logs -f
 ### Rebuild after code changes
 ```bash
 sudo docker compose down
-sudo docker compose build --no-cache
+GIT_SHA=$(git rev-parse --short HEAD) BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ) sudo -E docker compose build --no-cache
 sudo docker compose up -d
 ```
+This stamps the running container with the current commit + build time, shown as a small badge in the bottom-left corner of the app UI (hover it for full details) — a quick way to confirm the live page is serving the deploy you just pushed.
 
 ### Check container status
 ```bash

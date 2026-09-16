@@ -22,7 +22,10 @@ class TimerApp {
         
         // Create fullscreen button
         this.createFullscreenButton();
-        
+
+        // Create build/version badge
+        this.createBuildBadge();
+
         // Initialize
         this.loadState();
         this.updateDisplays();
@@ -52,7 +55,23 @@ class TimerApp {
         `;
         document.body.appendChild(this.fullscreenBtn);
     }
-    
+
+    createBuildBadge() {
+        const badge = document.createElement('div');
+        badge.id = 'buildBadge';
+        badge.className = 'build-badge';
+        document.body.appendChild(badge);
+
+        fetch('build-info.json?_=' + Date.now())
+            .then(res => res.ok ? res.json() : null)
+            .then(info => {
+                if (!info) return;
+                badge.textContent = `build ${info.sha} · ${info.date}`;
+                badge.title = `Commit: ${info.sha}\nBuilt: ${info.date}`;
+            })
+            .catch(() => {});
+    }
+
     bindEvents() {
         this.startStopBtn.addEventListener('click', () => this.toggleTimer());
         this.resetBtn.addEventListener('click', () => this.resetShotClock());
