@@ -242,6 +242,51 @@
             color: #fff;
         }
 
+        /* Log Entry Delete / Undo Button */
+        .log-del-btn {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .log-del-btn:hover {
+            background: rgba(239, 68, 68, 0.35);
+            border-color: #ef4444;
+            color: #ffffff;
+            transform: scale(1.06);
+        }
+
+        .log-del-btn.confirming {
+            background: #b91c1c !important;
+            border-color: #ef4444 !important;
+            color: #ffffff !important;
+            font-weight: 800;
+            padding: 3px 10px;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.65);
+            animation: pulseConfirm 0.7s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulseConfirm {
+            from {
+                opacity: 0.88;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1.04);
+            }
+        }
+
         /* Steppers & Counters */
         .section-label {
             font-size: 0.85rem;
@@ -333,6 +378,71 @@
             color: var(--color-amber);
             border-color: var(--color-amber);
             box-shadow: 0 0 12px rgba(234, 179, 8, 0.25);
+        }
+
+        /* Match Clocks Flanked by Alternating Possession Arrows */
+        .clocks-possession-row {
+            display: flex;
+            align-items: stretch;
+            gap: 0.65rem;
+            width: 100%;
+        }
+
+        .clock-poss-btn {
+            background: rgba(0, 0, 0, 0.35);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.5rem 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 58px;
+            flex-shrink: 0;
+            color: var(--text-muted);
+            user-select: none;
+        }
+
+        .clock-poss-btn:hover {
+            border-color: #64748b;
+            transform: translateY(-1px);
+        }
+
+        .clock-poss-arrow {
+            font-size: 3rem;
+            line-height: 1;
+            transition: transform 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        /* Left / Home Arrow Active */
+        .clock-poss-btn.is-home-active,
+        .clock-poss-btn.left.active {
+            background: rgba(59, 130, 246, 0.22);
+            border-color: #3b82f6;
+            color: #60a5fa;
+            box-shadow: 0 0 16px rgba(59, 130, 246, 0.4), inset 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+        .clock-poss-btn.is-home-active .clock-poss-arrow,
+        .clock-poss-btn.left.active .clock-poss-arrow {
+            color: #60a5fa;
+            text-shadow: 0 0 15px rgba(59, 130, 246, 0.95);
+            transform: scale(1.15);
+        }
+
+        /* Right / Guest Arrow Active */
+        .clock-poss-btn.is-guest-active,
+        .clock-poss-btn.right.active {
+            background: rgba(249, 115, 22, 0.22);
+            border-color: #f97316;
+            color: #fb923c;
+            box-shadow: 0 0 16px rgba(249, 115, 22, 0.4), inset 0 0 10px rgba(249, 115, 22, 0.2);
+        }
+        .clock-poss-btn.is-guest-active .clock-poss-arrow,
+        .clock-poss-btn.right.active .clock-poss-arrow {
+            color: #fb923c;
+            text-shadow: 0 0 15px rgba(249, 115, 22, 0.95);
+            transform: scale(1.15);
         }
 
         /* Center Column Controls */
@@ -553,13 +663,6 @@
                     <button class="tol-btn active" id="homeTol3" onclick="setHomeTOL(3)">3</button>
                 </div>
             </div>
-
-            <!-- Possession Arrow -->
-            <div>
-                <button class="possession-btn" id="homePossessionBtn" onclick="togglePossession('home')">
-                    <span>&#9664; HOME POSSESSION</span>
-                </button>
-            </div>
         </section>
 
 
@@ -581,15 +684,25 @@
                 </div>
             </div>
 
-            <!-- Game & Shot Timers Box -->
-            <div class="timer-container">
-                <div class="section-label" style="color: var(--color-green);">GAME CLOCK</div>
-                <div class="game-clock-val" id="gameClockDisplay">10:00</div>
+            <!-- Clocks Flanked by Alternating Possession Arrows -->
+            <div class="clocks-possession-row">
+                <button class="clock-poss-btn left" id="clockPossLeftBtn" onclick="toggleClockPossession('left')" title="Possession Arrow (Left)">
+                    <span class="clock-poss-arrow">&#9664;</span>
+                </button>
 
-                <div style="margin-top: 1rem;">
-                    <div class="section-label" style="color: var(--color-red);">SHOT CLOCK</div>
-                    <div class="shot-clock-val" id="shotClockDisplay">24</div>
+                <div class="timer-container" style="flex: 1;">
+                    <div class="section-label" style="color: var(--color-green);">GAME CLOCK</div>
+                    <div class="game-clock-val" id="gameClockDisplay">10:00</div>
+
+                    <div style="margin-top: 0.85rem;">
+                        <div class="section-label" style="color: var(--color-red);">SHOT CLOCK</div>
+                        <div class="shot-clock-val" id="shotClockDisplay">24</div>
+                    </div>
                 </div>
+
+                <button class="clock-poss-btn right" id="clockPossRightBtn" onclick="toggleClockPossession('right')" title="Possession Arrow (Right)">
+                    <span class="clock-poss-arrow">&#9654;</span>
+                </button>
             </div>
 
             <!-- Main Timer Controls -->
@@ -673,19 +786,12 @@
                     <button class="tol-btn active" id="guestTol3" onclick="setGuestTOL(3)">3</button>
                 </div>
             </div>
-
-            <!-- Possession Arrow -->
-            <div>
-                <button class="possession-btn" id="guestPossessionBtn" onclick="togglePossession('guest')">
-                    <span>GUEST POSSESSION &#9654;</span>
-                </button>
-            </div>
         </section>
     </main>
 
     <!-- SCORE ANALYTICS & LEAD TRACKER PANEL -->
     <section class="card" style="margin-top: 1rem;">
-        <div class="card-header" style="justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+        <div class="card-header" style="justify-content: flex-start; flex-wrap: wrap; gap: 0.75rem;">
             <div style="display: flex; align-items: center; gap: 0.75rem;">
                 <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
                     <span>📈</span> MATCH LEAD TRACKER & SCORE LOG
@@ -694,9 +800,6 @@
                     TIED GAME (0 PTS DIFF)
                 </span>
             </div>
-            <button class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3);" onclick="clearScoreLog()">
-                🗑️ CLEAR LOG HISTORY
-            </button>
         </div>
 
         <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 1rem; margin-top: 1rem;">
@@ -708,24 +811,24 @@
                 </div>
             </div>
 
-            <!-- SCORE EVENT HISTORY LOG -->
+            <!-- MATCH EVENT HISTORY LOG -->
             <div style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; max-height: 320px;">
-                <div class="section-label" style="margin-bottom: 0.75rem;">REAL-TIME SCORE CHANGE LOG</div>
+                <div class="section-label" style="margin-bottom: 0.75rem;">REAL-TIME EVENT & SCORE LOG</div>
                 <div style="overflow-y: auto; flex: 1; padding-right: 0.25rem;">
                     <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
                         <thead>
                             <tr style="color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
                                 <th style="padding: 0.4rem 0.2rem;">CLOCK</th>
                                 <th style="padding: 0.4rem 0.2rem;">TEAM</th>
-                                <th style="padding: 0.4rem 0.2rem;">PTS</th>
-                                <th style="padding: 0.4rem 0.2rem;">SCORE</th>
-                                <th style="padding: 0.4rem 0.2rem;">LEAD</th>
+                                <th style="padding: 0.4rem 0.2rem;">EVENT</th>
+                                <th style="padding: 0.4rem 0.2rem;">STATE</th>
+                                <th style="padding: 0.4rem 0.2rem; text-align: center;">UNDO</th>
                             </tr>
                         </thead>
                         <tbody id="scoreLogTableBody">
                             <tr>
                                 <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">
-                                    No score events logged yet. Adjust score to begin tracking.
+                                    No events logged yet. Adjust score, fouls, or possession to begin tracking.
                                 </td>
                             </tr>
                         </tbody>
@@ -740,6 +843,7 @@
         <div class="hotkey-item"><kbd>SPACE</kbd> Start / Pause Timer</div>
         <div class="hotkey-item"><kbd>R</kbd> Reset Shot Clock 24s</div>
         <div class="hotkey-item"><kbd>F</kbd> Reset Shot Clock 14s</div>
+        <div class="hotkey-item"><kbd>P</kbd> Flip Possession Arrow</div>
         <div class="hotkey-item"><kbd>F11</kbd> Fullscreen</div>
     </footer>
 
@@ -841,8 +945,8 @@
             guestScore: 0,      // 0-199
             homeFouls: 0,       // 0-9
             guestFouls: 0,      // 0-9
-            homeTOL: 3,         // 0-3
-            guestTOL: 3,        // 0-3
+            homeTOL: 2,         // 0-3 (FIBA: 2 in 1st half, 3 in 2nd half, 1 in OT)
+            guestTOL: 2,        // 0-3 (FIBA: 2 in 1st half, 3 in 2nd half, 1 in OT)
             period: "1",        // "1", "2", "3", "4", "OT"
             possession: "none", // "none", "home", "guest"
             gameSeconds: 600,   // default 600 (10:00)
@@ -942,17 +1046,24 @@
                 }
             });
 
-            const homePoss = document.getElementById('homePossessionBtn');
-            const guestPoss = document.getElementById('guestPossessionBtn');
-            if (gameState.possession === 'home') {
-                homePoss.classList.add('active');
-                guestPoss.classList.remove('active');
-            } else if (gameState.possession === 'guest') {
-                guestPoss.classList.add('active');
-                homePoss.classList.remove('active');
-            } else {
-                homePoss.classList.remove('active');
-                guestPoss.classList.remove('active');
+            const leftPossBtn = document.getElementById('clockPossLeftBtn');
+            const rightPossBtn = document.getElementById('clockPossRightBtn');
+
+            const isSwapped = !!gameState.swapSides;
+            const leftActive = isSwapped ? (gameState.possession === 'guest') : (gameState.possession === 'home');
+            const rightActive = isSwapped ? (gameState.possession === 'home') : (gameState.possession === 'guest');
+
+            if (leftPossBtn) {
+                leftPossBtn.classList.remove('active', 'is-home-active', 'is-guest-active');
+                if (leftActive) {
+                    leftPossBtn.classList.add('active', isSwapped ? 'is-guest-active' : 'is-home-active');
+                }
+            }
+            if (rightPossBtn) {
+                rightPossBtn.classList.remove('active', 'is-home-active', 'is-guest-active');
+                if (rightActive) {
+                    rightPossBtn.classList.add('active', isSwapped ? 'is-home-active' : 'is-guest-active');
+                }
             }
 
             ['1', '2', '3', '4', 'OT'].forEach(p => {
@@ -988,10 +1099,10 @@
                 nextBtn.disabled = !canNext;
                 if (canNext) {
                     nextBtn.classList.add('ready');
-                    nextBtn.title = 'Chuyển sang hiệp tiếp theo (Đồng hồ hiệp đã về 00:00)';
+                    nextBtn.title = 'Advance to next period (Game clock reached 00:00)';
                 } else {
                     nextBtn.classList.remove('ready');
-                    nextBtn.title = 'Chỉ có thể bấm Next Period khi Game Clock về 00:00';
+                    nextBtn.title = 'Next Period is only available when Game Clock reaches 00:00';
                 }
             }
 
@@ -1050,6 +1161,7 @@
 
             const event = {
                 id: Date.now() + Math.random(),
+                type: 'score',
                 period: period,
                 gameClock: gameClock,
                 gameSeconds: gameState.gameSeconds,
@@ -1064,6 +1176,163 @@
             };
 
             gameState.scoreLog.push(event);
+            broadcastState();
+        }
+
+        function recordFoulEvent(team, delta, prevFouls, newFouls) {
+            if (!gameState.scoreLog) gameState.scoreLog = [];
+            const period = gameState.period || "1";
+            const gameClock = formatMMSS(gameState.gameSeconds);
+            const elapsedSec = getElapsedSeconds(period, gameState.gameSeconds);
+
+            const event = {
+                id: Date.now() + Math.random(),
+                type: 'foul',
+                period: period,
+                gameClock: gameClock,
+                gameSeconds: gameState.gameSeconds,
+                elapsedSeconds: elapsedSec,
+                team: team,
+                delta: delta,
+                prevFouls: prevFouls,
+                newFouls: newFouls,
+                timeStr: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            };
+            gameState.scoreLog.push(event);
+            broadcastState();
+        }
+
+        function recordTOLEvent(team, prevTOL, newTOL) {
+            if (!gameState.scoreLog) gameState.scoreLog = [];
+            const period = gameState.period || "1";
+            const gameClock = formatMMSS(gameState.gameSeconds);
+            const elapsedSec = getElapsedSeconds(period, gameState.gameSeconds);
+
+            const event = {
+                id: Date.now() + Math.random(),
+                type: 'tol',
+                period: period,
+                gameClock: gameClock,
+                gameSeconds: gameState.gameSeconds,
+                elapsedSeconds: elapsedSec,
+                team: team,
+                prevTOL: prevTOL,
+                newTOL: newTOL,
+                timeStr: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            };
+            gameState.scoreLog.push(event);
+            broadcastState();
+        }
+
+        function recordPossessionEvent(prevPossession, newPossession) {
+            if (!gameState.scoreLog) gameState.scoreLog = [];
+            const period = gameState.period || "1";
+            const gameClock = formatMMSS(gameState.gameSeconds);
+            const elapsedSec = getElapsedSeconds(period, gameState.gameSeconds);
+
+            const event = {
+                id: Date.now() + Math.random(),
+                type: 'possession',
+                period: period,
+                gameClock: gameClock,
+                gameSeconds: gameState.gameSeconds,
+                elapsedSeconds: elapsedSec,
+                team: newPossession === 'none' ? 'NEUTRAL' : newPossession.toUpperCase(),
+                prevPossession: prevPossession,
+                newPossession: newPossession,
+                timeStr: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            };
+            gameState.scoreLog.push(event);
+            broadcastState();
+        }
+
+        let confirmingDeleteId = null;
+        let confirmingDeleteTimeout = null;
+
+        function deleteLogRow(id, btn) {
+            if (String(confirmingDeleteId) !== String(id)) {
+                if (confirmingDeleteTimeout) {
+                    clearTimeout(confirmingDeleteTimeout);
+                }
+                confirmingDeleteId = id;
+                confirmingDeleteTimeout = setTimeout(() => {
+                    confirmingDeleteId = null;
+                    confirmingDeleteTimeout = null;
+                    renderScoreLogAndChart();
+                }, 3000);
+                renderScoreLogAndChart();
+                return;
+            }
+
+            // Confirmed 2nd click!
+            if (confirmingDeleteTimeout) {
+                clearTimeout(confirmingDeleteTimeout);
+                confirmingDeleteTimeout = null;
+            }
+            confirmingDeleteId = null;
+            executeRevertLogRow(id);
+        }
+
+        function executeRevertLogRow(id) {
+            if (!gameState.scoreLog) return;
+            const index = gameState.scoreLog.findIndex(item => String(item.id) === String(id));
+            if (index === -1) return;
+
+            const item = gameState.scoreLog[index];
+            const type = item.type || 'score';
+
+            if (type === 'score') {
+                // Revert score adjustment: subtract points if added, add back if subtracted
+                if (item.team === 'HOME') {
+                    gameState.homeScore = Math.max(0, Math.min(199, (gameState.homeScore || 0) - item.delta));
+                } else if (item.team === 'GUEST') {
+                    gameState.guestScore = Math.max(0, Math.min(199, (gameState.guestScore || 0) - item.delta));
+                }
+
+                // Adjust running scores in subsequent score entries
+                for (let i = index + 1; i < gameState.scoreLog.length; i++) {
+                    const sub = gameState.scoreLog[i];
+                    if ((sub.type || 'score') === 'score') {
+                        if (item.team === 'HOME') {
+                            sub.homeScore = Math.max(0, sub.homeScore - item.delta);
+                        } else if (item.team === 'GUEST') {
+                            sub.guestScore = Math.max(0, sub.guestScore - item.delta);
+                        }
+                        sub.diff = sub.homeScore - sub.guestScore;
+                    }
+                }
+            } else if (type === 'foul') {
+                // Revert foul adjustment: subtract foul if added, add back if subtracted
+                if (item.team === 'HOME') {
+                    gameState.homeFouls = Math.max(0, Math.min(9, (gameState.homeFouls || 0) - item.delta));
+                } else if (item.team === 'GUEST') {
+                    gameState.guestFouls = Math.max(0, Math.min(9, (gameState.guestFouls || 0) - item.delta));
+                }
+
+                // Adjust subsequent foul entries for the same team
+                for (let i = index + 1; i < gameState.scoreLog.length; i++) {
+                    const sub = gameState.scoreLog[i];
+                    if (sub.type === 'foul' && sub.team === item.team) {
+                        sub.prevFouls = Math.max(0, Math.min(9, sub.prevFouls - item.delta));
+                        sub.newFouls = Math.max(0, Math.min(9, sub.newFouls - item.delta));
+                    }
+                }
+            } else if (type === 'tol') {
+                // Revert timeout left to previous value
+                if (item.team === 'HOME') {
+                    gameState.homeTOL = item.prevTOL;
+                } else if (item.team === 'GUEST') {
+                    gameState.guestTOL = item.prevTOL;
+                }
+            } else if (type === 'possession') {
+                // Revert possession arrow to previous direction
+                gameState.possession = item.prevPossession || 'none';
+            }
+
+            // Remove the log entry
+            gameState.scoreLog.splice(index, 1);
+
+            // Sync updated state and broadcast
             broadcastState();
         }
 
@@ -1083,13 +1352,6 @@
             if (gameState.guestScore !== prevScore) {
                 recordScoreEvent('GUEST', delta, gameState.homeScore, gameState.guestScore);
             } else {
-                broadcastState();
-            }
-        }
-
-        function clearScoreLog() {
-            if (confirm("Are you sure you want to clear the score event history log?")) {
-                gameState.scoreLog = [];
                 broadcastState();
             }
         }
@@ -1126,31 +1388,70 @@
 
             if (tbody) {
                 if (logList.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">No score events logged yet. Adjust score to begin tracking.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">No events logged yet. Adjust score, fouls, or possession to begin tracking.</td></tr>`;
                 } else {
                     let html = '';
                     const reversed = [...logList].reverse();
                     reversed.forEach(item => {
+                        const type = item.type || 'score';
                         const isHome = item.team === 'HOME';
-                        const teamColor = isHome ? '#60a5fa' : '#fb923c';
-                        const deltaStr = item.delta > 0 ? `+${item.delta}` : `${item.delta}`;
-                        const deltaColor = item.delta > 0 ? '#22c55e' : '#ef4444';
+                        const teamColor = isHome ? '#60a5fa' : (item.team === 'GUEST' ? '#fb923c' : '#38bdf8');
 
-                        let leadTag = '';
-                        if (item.diff > 0) {
-                            leadTag = `<span style="color: #60a5fa; font-weight: 700;">HOME +${item.diff}</span>`;
-                        } else if (item.diff < 0) {
-                            leadTag = `<span style="color: #fb923c; font-weight: 700;">GUEST +${Math.abs(item.diff)}</span>`;
-                        } else {
-                            leadTag = `<span style="color: #94a3b8; font-weight: 700;">TIED</span>`;
+                        let teamCell = '';
+                        let eventCell = '';
+                        let stateCell = '';
+
+                        if (type === 'score') {
+                            const deltaStr = item.delta > 0 ? `+${item.delta}` : `${item.delta}`;
+                            const deltaColor = item.delta > 0 ? '#22c55e' : '#ef4444';
+
+                            let leadTag = '';
+                            if (item.diff > 0) {
+                                leadTag = `<span style="color: #60a5fa; font-weight: 700; margin-left: 0.3rem;">(+${item.diff})</span>`;
+                            } else if (item.diff < 0) {
+                                leadTag = `<span style="color: #fb923c; font-weight: 700; margin-left: 0.3rem;">(-${Math.abs(item.diff)})</span>`;
+                            } else {
+                                leadTag = `<span style="color: #94a3b8; font-weight: 700; margin-left: 0.3rem;">(TIED)</span>`;
+                            }
+
+                            teamCell = `<span style="color: ${teamColor}; font-weight: 700;">${item.team}</span>`;
+                            eventCell = `<span style="color: ${deltaColor}; font-weight: 800;">${deltaStr} PTS</span>`;
+                            stateCell = `<span style="font-family: var(--font-display); font-weight: 700;">${item.homeScore} - ${item.guestScore}</span>${leadTag}`;
+                        } else if (type === 'foul') {
+                            const deltaStr = item.delta > 0 ? `+${item.delta}` : `${item.delta}`;
+                            const deltaColor = item.delta > 0 ? '#f59e0b' : '#38bdf8';
+
+                            teamCell = `<span style="color: ${teamColor}; font-weight: 700;">${item.team}</span>`;
+                            eventCell = `<span style="color: ${deltaColor}; font-weight: 700;">FOUL ${deltaStr}</span>`;
+                            stateCell = `<span style="color: #f59e0b; font-weight: 700;">Fouls: ${item.newFouls}</span>`;
+                        } else if (type === 'tol') {
+                            teamCell = `<span style="color: ${teamColor}; font-weight: 700;">${item.team}</span>`;
+                            eventCell = `<span style="color: #a855f7; font-weight: 700;">TIMEOUT</span>`;
+                            stateCell = `<span>T.O.L: <b>${item.newTOL}</b> Left</span>`;
+                        } else if (type === 'possession') {
+                            let arrowStr = '';
+                            if (item.newPossession === 'home') arrowStr = '◀ HOME';
+                            else if (item.newPossession === 'guest') arrowStr = 'GUEST ▶';
+                            else arrowStr = 'CLEAR';
+
+                            teamCell = `<span style="color: #38bdf8; font-weight: 700;">POSS</span>`;
+                            eventCell = `<span style="color: #38bdf8; font-weight: 700;">${arrowStr}</span>`;
+                            stateCell = `<span style="color: var(--text-muted); font-size: 0.78rem;">Arrow change</span>`;
                         }
 
+                        const isConfirming = confirmingDeleteId !== null && String(confirmingDeleteId) === String(item.id);
+                        const btnClass = isConfirming ? 'log-del-btn confirming' : 'log-del-btn';
+                        const btnText = isConfirming ? '⚠️ CONFIRM?' : '✕';
+                        const btnTitle = isConfirming ? 'Click again to confirm undo' : 'Undo / Delete this event (Click twice)';
+
                         html += `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                            <td style="padding: 0.4rem 0.2rem; font-weight: 600;">Q${item.period} ${item.gameClock}</td>
-                            <td style="padding: 0.4rem 0.2rem; color: ${teamColor}; font-weight: 700;">${item.team}</td>
-                            <td style="padding: 0.4rem 0.2rem; color: ${deltaColor}; font-weight: 800;">${deltaStr}</td>
-                            <td style="padding: 0.4rem 0.2rem; font-family: var(--font-display);">${item.homeScore} - ${item.guestScore}</td>
-                            <td style="padding: 0.4rem 0.2rem;">${leadTag}</td>
+                            <td style="padding: 0.35rem 0.2rem; font-weight: 600; white-space: nowrap;">Q${item.period} ${item.gameClock}</td>
+                            <td style="padding: 0.35rem 0.2rem; white-space: nowrap;">${teamCell}</td>
+                            <td style="padding: 0.35rem 0.2rem; white-space: nowrap;">${eventCell}</td>
+                            <td style="padding: 0.35rem 0.2rem; white-space: nowrap;">${stateCell}</td>
+                            <td style="padding: 0.35rem 0.2rem; text-align: center; white-space: nowrap;">
+                                <button class="${btnClass}" onclick="deleteLogRow('${item.id}', this)" title="${btnTitle}">${btnText}</button>
+                            </td>
                         </tr>`;
                     });
                     tbody.innerHTML = html;
@@ -1178,6 +1479,8 @@
             }];
 
             logList.forEach(entry => {
+                const type = entry.type || 'score';
+                if (type !== 'score') return;
                 const elapsed = entry.elapsedSeconds ?? getElapsedSeconds(entry.period, entry.gameSeconds || 0);
                 rawDataPoints.push({
                     x: elapsed,
@@ -1453,32 +1756,77 @@
         }
 
         function adjustHomeFouls(delta) {
-            gameState.homeFouls = Math.max(0, Math.min(9, gameState.homeFouls + delta));
-            broadcastState();
+            const prev = gameState.homeFouls || 0;
+            const next = Math.max(0, Math.min(9, prev + delta));
+            if (next !== prev) {
+                gameState.homeFouls = next;
+                recordFoulEvent('HOME', delta, prev, next);
+            }
         }
 
         function adjustGuestFouls(delta) {
-            gameState.guestFouls = Math.max(0, Math.min(9, gameState.guestFouls + delta));
-            broadcastState();
+            const prev = gameState.guestFouls || 0;
+            const next = Math.max(0, Math.min(9, prev + delta));
+            if (next !== prev) {
+                gameState.guestFouls = next;
+                recordFoulEvent('GUEST', delta, prev, next);
+            }
         }
 
         function setHomeTOL(val) {
-            gameState.homeTOL = val;
-            broadcastState();
+            const prev = gameState.homeTOL;
+            if (prev !== val) {
+                gameState.homeTOL = val;
+                recordTOLEvent('HOME', prev, val);
+            }
         }
 
         function setGuestTOL(val) {
-            gameState.guestTOL = val;
-            broadcastState();
+            const prev = gameState.guestTOL;
+            if (prev !== val) {
+                gameState.guestTOL = val;
+                recordTOLEvent('GUEST', prev, val);
+            }
+        }
+
+        function toggleClockPossession(side) {
+            const isSwapped = !!gameState.swapSides;
+            const targetTeam = (!isSwapped) ? (side === 'left' ? 'home' : 'guest') : (side === 'left' ? 'guest' : 'home');
+            togglePossession(targetTeam);
         }
 
         function togglePossession(team) {
-            if (gameState.possession === team) {
-                gameState.possession = 'none';
-            } else {
-                gameState.possession = team;
+            const prev = gameState.possession || 'none';
+            const next = (prev === team) ? 'none' : team;
+            if (next !== prev) {
+                gameState.possession = next;
+                recordPossessionEvent(prev, next);
             }
-            broadcastState();
+        }
+
+        function flipPossession() {
+            const prev = gameState.possession || 'none';
+            let next = 'home';
+            if (prev === 'home') {
+                next = 'guest';
+            } else if (prev === 'guest') {
+                next = 'home';
+            } else {
+                // When starting from neutral / jump ball
+                next = gameState.swapSides ? 'guest' : 'home';
+            }
+            if (next !== prev) {
+                gameState.possession = next;
+                recordPossessionEvent(prev, next);
+            }
+        }
+
+        function setPossession(team) {
+            const prev = gameState.possession || 'none';
+            if (prev !== team) {
+                gameState.possession = team;
+                recordPossessionEvent(prev, team);
+            }
         }
 
         function setPeriod(p) {
@@ -1677,7 +2025,7 @@
         }
 
         function nextPeriod() {
-            // Chỉ có thể next period khi game clock đã về 0
+            // Next period is only allowed when game clock has reached 0
             if (gameState.gameSeconds > 0) return;
 
             const periods = ['1', '2', '3', '4', 'OT'];
@@ -1691,7 +2039,7 @@
             }
             gameState.period = targetPeriod;
 
-            // Reset team fouls về 0 khi sang hiệp mới, trừ khi từ Q4 sang OT (hoặc giữa các hiệp phụ)
+            // Reset team fouls to 0 on new period, except when advancing from Q4 to OT (or between overtimes)
             const isQ4ToOT = (currentPeriod === '4' && targetPeriod === 'OT') || (currentPeriod === 'OT' && targetPeriod === 'OT');
             if (!isQ4ToOT) {
                 gameState.homeFouls = 0;
@@ -1758,8 +2106,8 @@
                 guestScore: 0,
                 homeFouls: 0,
                 guestFouls: 0,
-                homeTOL: 3,
-                guestTOL: 3,
+                homeTOL: 2,
+                guestTOL: 2,
                 period: "1",
                 possession: "none",
                 gameSeconds: 600,
@@ -1788,6 +2136,9 @@
             } else if (e.key === 'f' || e.key === 'F') {
                 e.preventDefault();
                 resetShotClock(14);
+            } else if (e.key === 'p' || e.key === 'P') {
+                e.preventDefault();
+                flipPossession();
             }
         });
 

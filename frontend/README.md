@@ -58,6 +58,7 @@ A state-of-the-art, dual-monitor stadium LED scoreboard system designed for PC/l
   * `SPACE` - Start / Pause Timer
   * `R` - Reset Shot Clock to 24s
   * `F` - Reset Shot Clock to 14s
+  * `P` - Flip Possession Arrow
 
 ### Usage
 1. Open `app/pc/5x5/control.html` on the operator's laptop/monitor.
