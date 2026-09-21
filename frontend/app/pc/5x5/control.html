@@ -159,7 +159,7 @@
 
         .score-value {
             font-family: var(--font-display);
-            font-size: 4.5rem;
+            font-size: 5rem;
             font-weight: 700;
             line-height: 1;
             color: #ffffff;
@@ -198,6 +198,28 @@
 
         .btn:active {
             transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .btn:disabled:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-color);
+            transform: none !important;
+        }
+
+        #nextPeriodBtn.ready {
+            border-color: var(--color-green);
+            color: var(--color-green);
+            background: rgba(16, 185, 129, 0.12);
+        }
+        #nextPeriodBtn.ready:hover {
+            background: rgba(16, 185, 129, 0.22);
+            border-color: var(--color-green);
         }
 
         .btn-home {
@@ -473,9 +495,12 @@
             <span>BASKETBALL REFEREE CONTROL</span>
             <span class="badge-5x5">PC 5x5 Official</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
             <button class="btn" id="swapSidesBtn" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;" onclick="toggleSwapSides()">
                 <span>⇆</span> <span id="swapSidesLabel">SWAP DISPLAY SIDES</span>
+            </button>
+            <button class="btn" id="fullscreenBtn" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem;" onclick="toggleFullscreen()" title="Toggle Fullscreen (F11)">
+                <span id="fullscreenIcon">⛶</span> <span id="fullscreenLabel">FULLSCREEN</span>
             </button>
             <div class="status-pill" id="broadcastStatus">
                 <span class="status-dot"></span>
@@ -583,7 +608,7 @@
                     <button class="btn" onmousedown="startGameClockHold(1)" onmouseup="stopGameClockHold()" onmouseleave="stopGameClockHold()" ontouchstart="startGameClockHold(1)" ontouchend="stopGameClockHold()" ontouchcancel="stopGameClockHold()">+1 SEC</button>
                     <button class="btn" onmousedown="startGameClockHold(-1)" onmouseup="stopGameClockHold()" onmouseleave="stopGameClockHold()" ontouchstart="startGameClockHold(-1)" ontouchend="stopGameClockHold()" ontouchcancel="stopGameClockHold()">-1 SEC</button>
                     <button class="btn" onclick="resetGameClock10()">RESET GAME CLOCK (10:00)</button>
-                    <button class="btn" onclick="nextPeriod()">NEXT PERIOD &#10145;</button>
+                    <button class="btn" id="nextPeriodBtn" onclick="nextPeriod()">NEXT PERIOD &#10145;</button>
                 </div>
             </div>
 
@@ -715,6 +740,7 @@
         <div class="hotkey-item"><kbd>SPACE</kbd> Start / Pause Timer</div>
         <div class="hotkey-item"><kbd>R</kbd> Reset Shot Clock 24s</div>
         <div class="hotkey-item"><kbd>F</kbd> Reset Shot Clock 14s</div>
+        <div class="hotkey-item"><kbd>F11</kbd> Fullscreen</div>
     </footer>
 
     <!-- Logic Script -->
@@ -741,11 +767,26 @@
         window.addEventListener('click', unlockAudio, { once: true });
         window.addEventListener('keydown', unlockAudio, { once: true });
 
+        let lastBuzzerPlayTime = 0;
+
         // Sharp Arena Stadium Electric Horn Buzzer (High-power cutting stadium horn tone)
-        function playStadiumBuzzerSound() {
+        function playStadiumBuzzerSound(broadcast = true) {
+            if (broadcast) {
+                try {
+                    channel.postMessage({ type: 'PLAY_BUZZER' });
+                } catch(e) {}
+            }
+
+            const nowTime = Date.now();
+            if (nowTime - lastBuzzerPlayTime < 800) return;
+            lastBuzzerPlayTime = nowTime;
+
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
+                if (ctx.state === 'suspended') {
+                    ctx.resume().catch(() => {});
+                }
 
                 const now = ctx.currentTime;
                 const duration = 1.4;
@@ -833,6 +874,8 @@
         channel.onmessage = function(event) {
             if (event.data && event.data.type === 'REQUEST_STATE') {
                 broadcastState();
+            } else if (event.data && event.data.type === 'PLAY_BUZZER') {
+                playStadiumBuzzerSound(false);
             }
         };
 
@@ -937,6 +980,19 @@
                 startBtn.className = 'btn-start-pause stopped';
                 icon.innerHTML = '&#9654;';
                 text.textContent = 'START TIMER';
+            }
+
+            const nextBtn = document.getElementById('nextPeriodBtn');
+            if (nextBtn) {
+                const canNext = gameState.gameSeconds === 0;
+                nextBtn.disabled = !canNext;
+                if (canNext) {
+                    nextBtn.classList.add('ready');
+                    nextBtn.title = 'Chuyển sang hiệp tiếp theo (Đồng hồ hiệp đã về 00:00)';
+                } else {
+                    nextBtn.classList.remove('ready');
+                    nextBtn.title = 'Chỉ có thể bấm Next Period khi Game Clock về 00:00';
+                }
             }
 
             renderScoreLogAndChart();
@@ -1440,48 +1496,120 @@
             broadcastState();
         }
 
-        function startTimerLoop() {
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                if (!gameState.isRunning) {
-                    clearInterval(timerInterval);
-                    return;
-                }
+        let timerWorker = null;
+        let lastTimerTimestamp = 0;
 
-                let stateChanged = false;
-
-                if (gameState.gameSeconds > 0) {
-                    gameState.gameSeconds = Math.max(0, Math.round((gameState.gameSeconds - 0.1) * 10) / 10);
-                    stateChanged = true;
-                } else {
-                    gameState.gameSeconds = 0;
-                    gameState.isRunning = false;
-                    stopTimerLoop();
-                    stateChanged = true;
-                }
-
-                if (gameState.isRunning) {
-                    if (gameState.shotSeconds > 0) {
-                        const prevShot = gameState.shotSeconds;
-                        gameState.shotSeconds = Math.max(0, Math.round((gameState.shotSeconds - 0.1) * 10) / 10);
-                        stateChanged = true;
-                        if (gameState.shotSeconds === 0 && prevShot > 0) {
-                            playStadiumBuzzerSound();
+        function initTimerWorker() {
+            if (timerWorker) return timerWorker;
+            try {
+                const blob = new Blob([`
+                    let tid = null;
+                    self.onmessage = function(e) {
+                        if (e.data === 'start') {
+                            if (tid) clearInterval(tid);
+                            tid = setInterval(function() { self.postMessage('tick'); }, 100);
+                        } else if (e.data === 'stop') {
+                            if (tid) { clearInterval(tid); tid = null; }
                         }
+                    };
+                `], { type: 'application/javascript' });
+                timerWorker = new Worker(URL.createObjectURL(blob));
+                timerWorker.onmessage = function(e) {
+                    if (e.data === 'tick') {
+                        onTimerTick();
                     }
-                    if (gameState.shotSeconds > gameState.gameSeconds) {
-                        gameState.shotSeconds = gameState.gameSeconds;
-                        stateChanged = true;
-                    }
-                }
+                };
+            } catch(err) {
+                console.warn("Web worker timer initialization failed, falling back to interval:", err);
+                timerWorker = null;
+            }
+            return timerWorker;
+        }
 
-                if (stateChanged) {
-                    broadcastState();
+        function onTimerTick() {
+            if (!gameState.isRunning) {
+                stopTimerLoop();
+                return;
+            }
+
+            const now = performance.now();
+            const deltaSeconds = (now - lastTimerTimestamp) / 1000;
+            lastTimerTimestamp = now;
+
+            if (deltaSeconds <= 0) return;
+
+            let stateChanged = false;
+
+            // 1. Game Clock Countdown
+            let gameEnded = false;
+            if (gameState.gameSeconds > 0) {
+                const prevGame = gameState.gameSeconds;
+                gameState.gameSeconds = Math.max(0, Math.round((gameState.gameSeconds - deltaSeconds) * 10) / 10);
+                stateChanged = true;
+                if (gameState.gameSeconds === 0 && prevGame > 0) {
+                    gameEnded = true;
                 }
-            }, 100);
+            } else {
+                gameState.gameSeconds = 0;
+            }
+
+            // 2. Shot Clock Countdown
+            let shotEnded = false;
+            if (gameState.shotSeconds > 0) {
+                const prevShot = gameState.shotSeconds;
+                gameState.shotSeconds = Math.max(0, Math.round((gameState.shotSeconds - deltaSeconds) * 10) / 10);
+                stateChanged = true;
+                if (gameState.shotSeconds === 0 && prevShot > 0) {
+                    shotEnded = true;
+                }
+            } else {
+                gameState.shotSeconds = 0;
+            }
+
+            // 3. FIBA Rule: Shot Clock can never exceed remaining Game Clock
+            if (gameState.shotSeconds > gameState.gameSeconds) {
+                gameState.shotSeconds = gameState.gameSeconds;
+                stateChanged = true;
+            }
+
+            // 4. Handle End of Clock Events
+            if (gameState.gameSeconds === 0) {
+                // Game clock ended (Period over): shot clock must be 0
+                gameState.shotSeconds = 0;
+                gameState.isRunning = false;
+                stopTimerLoop();
+                stateChanged = true;
+                if (gameEnded) {
+                    playStadiumBuzzerSound();
+                }
+            } else if (shotEnded) {
+                // Shot clock expired (24s / 14s violation): buzzer + stop game clock
+                playStadiumBuzzerSound();
+                gameState.isRunning = false;
+                stopTimerLoop();
+                stateChanged = true;
+            }
+
+            if (stateChanged) {
+                broadcastState();
+            }
+        }
+
+        function startTimerLoop() {
+            stopTimerLoop();
+            lastTimerTimestamp = performance.now();
+            const worker = initTimerWorker();
+            if (worker) {
+                worker.postMessage('start');
+            } else {
+                timerInterval = setInterval(onTimerTick, 100);
+            }
         }
 
         function stopTimerLoop() {
+            if (timerWorker) {
+                timerWorker.postMessage('stop');
+            }
             if (timerInterval) {
                 clearInterval(timerInterval);
                 timerInterval = null;
@@ -1549,14 +1677,28 @@
         }
 
         function nextPeriod() {
+            // Chỉ có thể next period khi game clock đã về 0
+            if (gameState.gameSeconds > 0) return;
+
             const periods = ['1', '2', '3', '4', 'OT'];
             const idx = periods.indexOf(gameState.period);
+            const currentPeriod = gameState.period;
+            let targetPeriod = 'OT';
             if (idx >= 0 && idx < periods.length - 1) {
-                gameState.period = periods[idx + 1];
+                targetPeriod = periods[idx + 1];
             } else {
-                gameState.period = 'OT';
+                targetPeriod = 'OT';
             }
-            gameState.gameSeconds = 600;
+            gameState.period = targetPeriod;
+
+            // Reset team fouls về 0 khi sang hiệp mới, trừ khi từ Q4 sang OT (hoặc giữa các hiệp phụ)
+            const isQ4ToOT = (currentPeriod === '4' && targetPeriod === 'OT') || (currentPeriod === 'OT' && targetPeriod === 'OT');
+            if (!isQ4ToOT) {
+                gameState.homeFouls = 0;
+                gameState.guestFouls = 0;
+            }
+
+            gameState.gameSeconds = (targetPeriod === 'OT') ? 300 : 600;
             gameState.shotSeconds = 24;
             gameState.isRunning = false;
             stopTimerLoop();
@@ -1646,6 +1788,28 @@
             } else if (e.key === 'f' || e.key === 'F') {
                 e.preventDefault();
                 resetShotClock(14);
+            }
+        });
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const isFs = !!document.fullscreenElement;
+            const icon = document.getElementById('fullscreenIcon');
+            const label = document.getElementById('fullscreenLabel');
+            if (icon && label) {
+                icon.textContent = isFs ? '🗗' : '⛶';
+                label.textContent = isFs ? 'EXIT FULLSCREEN' : 'FULLSCREEN';
             }
         });
 

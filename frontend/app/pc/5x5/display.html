@@ -70,7 +70,7 @@
         /* --- HEADER ROW: TEAMS & PERIOD --- */
         .row-header {
             display: grid;
-            grid-template-columns: 0.85fr 1.3fr 0.85fr;
+            grid-template-columns: 1.25fr 0.75fr 1.25fr;
             align-items: center;
             text-align: center;
             height: 14vh;
@@ -94,33 +94,30 @@
             justify-content: center;
             background: var(--panel-bg);
             border: 2px solid var(--frame-border);
-            border-radius: 16px;
-            padding: 0.8vh 2vw;
+            border-radius: 18px;
+            padding: 1.2vh 2.6vw;
             margin: 0 auto;
             width: max-content;
-            min-width: 50%;
+            min-width: 65%;
+            height: 82%;
             box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.85);
         }
 
         .header-period-group {
             display: flex;
             align-items: center;
-            gap: 1.5vw;
-        }
-
-        .header-title {
-            font-size: clamp(0.75rem, 1.6vh, 1.6rem);
-            letter-spacing: 2px;
-            color: #828a9a;
-            font-weight: 800;
-            text-transform: uppercase;
+            justify-content: center;
+            gap: 2vw;
         }
 
         .possession-arrow {
-            font-size: clamp(1.8rem, 4vh, 4.5rem);
+            font-size: clamp(2.4rem, 5.5vh, 5.5rem);
             font-family: var(--font-digits);
             color: var(--color-unlit);
             transition: all 0.2s ease;
+            line-height: 1;
+            display: flex;
+            align-items: center;
         }
 
         .possession-arrow.active {
@@ -130,18 +127,19 @@
 
         .period-digit {
             font-family: var(--font-digits);
-            font-size: clamp(2.5rem, 5.5vh, 6rem);
+            font-size: clamp(3.5rem, 8vh, 8rem);
             font-weight: 900;
             color: var(--color-amber);
             text-shadow: 0 0 15px var(--color-amber-glow);
             line-height: 1;
-            min-width: 1.8rem;
+            min-width: 2.2rem;
+            text-align: center;
         }
 
         /* --- MAIN ROW: TEAM SCORES & CENTER CLOCKS (GAME CLOCK + SHOT CLOCK) --- */
         .row-main {
             display: grid;
-            grid-template-columns: 0.85fr 1.3fr 0.85fr;
+            grid-template-columns: 1.25fr 0.75fr 1.25fr;
             gap: 1.5vw;
             align-items: center;
             height: 62vh;
@@ -163,7 +161,7 @@
 
         .digit-score {
             font-family: var(--font-digits);
-            font-size: clamp(6rem, 18vh, 18vw);
+            font-size: clamp(9.7rem, 34vh, 19.3vw);
             font-weight: 900;
             line-height: 0.9;
             color: var(--color-amber);
@@ -187,35 +185,30 @@
             background: var(--panel-bg);
             border: 2px solid var(--frame-border);
             border-radius: 18px;
-            padding: 1vh 1vw;
+            padding: 0.8vh 1vw;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex: 1; /* Slightly smaller box */
+            flex: 0.8; /* Smaller box */
             box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9);
-        }
-
-        .clock-label {
-            font-size: clamp(0.75rem, 1.6vh, 1.6rem);
-            font-weight: 900;
-            letter-spacing: 3px;
-            color: #828a9a;
-            text-transform: uppercase;
         }
 
         .game-clock-digit {
             font-family: var(--font-digits);
-            font-size: clamp(3rem, 9.5vh, 9vw);
+            font-size: clamp(3.5rem, 12vh, 5.8vw);
             font-weight: 900;
             color: var(--color-green);
             text-shadow: 0 0 18px var(--color-green-glow);
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             line-height: 1;
-            margin-top: 0.5vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
         }
 
-        /* BOTTOM BOX: SHOT CLOCK BOX (SLIGHTLY BIGGER) */
+        /* BOTTOM BOX: SHOT CLOCK BOX (BIGGER) */
         .shot-clock-box {
             background: var(--panel-bg);
             border: 2px solid var(--frame-border);
@@ -225,7 +218,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex: 1.35; /* Slightly bigger box than game clock */
+            flex: 1.5; /* Bigger box than game clock */
             box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9);
             position: relative;
             overflow: hidden;
@@ -234,7 +227,7 @@
 
         .shot-clock-digit {
             font-family: var(--font-digits);
-            font-size: clamp(4.5rem, 16vh, 14vw);
+            font-size: clamp(7.5rem, 28vh, 14vw);
             font-weight: 900;
             line-height: 0.95;
             color: var(--color-red);
@@ -242,7 +235,6 @@
             letter-spacing: 2px;
             text-align: center;
             width: 100%;
-            margin-top: 0.5vh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -328,7 +320,13 @@
         .stats-panel.bonus .tol-square.active {
             background-color: #ffffff !important;
             border-color: #ffffff !important;
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.9) !important;
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.95), inset 0 0 4px rgba(255, 255, 255, 0.5) !important;
+        }
+
+        .stats-panel.bonus .tol-square:not(.active) {
+            background-color: rgba(0, 0, 0, 0.45) !important;
+            border-color: rgba(255, 255, 255, 0.3) !important;
+            box-shadow: none !important;
         }
 
         .foul-group {
@@ -365,25 +363,110 @@
         .tol-indicators {
             display: flex;
             gap: 0.6vw;
+            align-items: center;
         }
 
         .tol-square {
             width: clamp(20px, 3vh, 36px);
             height: clamp(20px, 3vh, 36px);
-            background-color: var(--color-unlit);
-            border: 2px solid var(--color-unlit-border);
+            background-color: #141720;
+            border: 2px solid #283144;
             border-radius: 6px;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
         }
 
         .tol-square.active {
             background-color: var(--color-red);
-            border-color: #ff7777;
-            box-shadow: 0 0 12px var(--color-red-glow);
+            border-color: #ff6666;
+            box-shadow: 0 0 14px var(--color-red-glow), inset 0 0 4px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Subtle Audio Status Badge */
+        .audio-status-badge {
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(14, 16, 20, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #94a3b8;
+            cursor: pointer;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .audio-status-badge.prompt {
+            border-color: #eab308;
+            color: #facc15;
+            animation: pulse-audio-badge 2s infinite ease-in-out;
+        }
+
+        .audio-status-badge.unlocked {
+            border-color: rgba(34, 197, 94, 0.4);
+            color: #4ade80;
+            opacity: 0.35;
+        }
+
+        .audio-status-badge.unlocked:hover {
+            opacity: 1;
+        }
+
+        /* Floating Fullscreen Button for Display */
+        .btn-fullscreen {
+            position: fixed;
+            top: 14px;
+            right: 18px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(14, 16, 20, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #94a3b8;
+            cursor: pointer;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-fullscreen:hover {
+            background: rgba(30, 41, 59, 0.95);
+            border-color: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+            transform: scale(1.04);
+        }
+
+        /* In fullscreen mode, keep button discreet unless hovered */
+        :fullscreen .btn-fullscreen {
+            opacity: 0.25;
+        }
+
+        :fullscreen .btn-fullscreen:hover {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
+
+    <!-- Fullscreen Button for Stadium Display -->
+    <button id="displayFullscreenBtn" class="btn-fullscreen" onclick="toggleFullscreen()" title="Toggle Fullscreen (or Double-Click background)">
+        <span id="displayFsIcon">⛶</span>
+        <span id="displayFsText">FULLSCREEN</span>
+    </button>
 
     <div class="scoreboard-casing">
 
@@ -394,10 +477,7 @@
             <div class="header-center">
                 <div class="header-period-group">
                     <span class="possession-arrow" id="homeArrow">&#9664;</span>
-                    <div style="text-align: center;">
-                        <div class="header-title">PERIOD</div>
-                        <div class="period-digit" id="periodDisplay">1</div>
-                    </div>
+                    <div class="period-digit" id="periodDisplay">1</div>
                     <span class="possession-arrow" id="guestArrow">&#9654;</span>
                 </div>
             </div>
@@ -416,13 +496,11 @@
             <div class="clocks-column">
                 <!-- TOP BOX: GAME CLOCK BOX -->
                 <div class="game-clock-box">
-                    <div class="clock-label">GAME CLOCK</div>
                     <div class="game-clock-digit" id="gameClock">10:00</div>
                 </div>
 
                 <!-- BOTTOM BOX: SHOT CLOCK BOX (SLIGHTLY BIGGER) -->
                 <div class="shot-clock-box" id="shotClockBox">
-                    <div class="clock-label">SHOT CLOCK</div>
                     <div class="shot-clock-digit" id="shotClock">24</div>
                 </div>
             </div>
@@ -470,68 +548,121 @@
 
     </div>
 
+    <!-- Audio Status Badge for Browser Autoplay Compliance -->
+    <div id="audioStatusBadge" class="audio-status-badge prompt" onclick="unlockAudio(true)" title="Click anywhere to enable Stadium Horn">
+        <span>🔊</span>
+        <span id="audioText">Click to enable Horn Sound</span>
+    </div>
+
     <!-- Receiver, Synchronizer & Audio Buzzer Script -->
     <script>
         const channel = new BroadcastChannel('basketball_scoreboard');
 
-        // Web Audio API Stadium Horn Buzzer Sound (Plays in foreground & background tabs)
+        // Web Audio API Stadium Horn Buzzer Sound (Plays on both screens)
         let audioCtx = null;
+        let lastBuzzerPlayTime = 0;
+        let audioUnlocked = false;
 
         function getAudioContext() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
             if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
+                audioCtx.resume().catch(() => {});
             }
             return audioCtx;
         }
 
-        function playBuzzerSound() {
-            try {
-                const ctx = getAudioContext();
-                if (!ctx) return;
+        function updateAudioBadge(isReady) {
+            const badge = document.getElementById('audioStatusBadge');
+            const text = document.getElementById('audioText');
+            if (!badge || !text) return;
 
-                const osc1 = ctx.createOscillator();
-                const osc2 = ctx.createOscillator();
-                const osc3 = ctx.createOscillator();
-                const gainNode = ctx.createGain();
-
-                osc1.type = 'sawtooth';
-                osc2.type = 'square';
-                osc3.type = 'sawtooth';
-
-                // Loud stadium horn fundamentals & harmonics
-                osc1.frequency.setValueAtTime(215, ctx.currentTime);
-                osc2.frequency.setValueAtTime(270, ctx.currentTime);
-                osc3.frequency.setValueAtTime(430, ctx.currentTime);
-
-                gainNode.gain.setValueAtTime(0.7, ctx.currentTime);
-                gainNode.gain.setValueAtTime(0.7, ctx.currentTime + 1.4);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.8);
-
-                osc1.connect(gainNode);
-                osc2.connect(gainNode);
-                osc3.connect(gainNode);
-                gainNode.connect(ctx.destination);
-
-                osc1.start(ctx.currentTime);
-                osc2.start(ctx.currentTime);
-                osc3.start(ctx.currentTime);
-                osc1.stop(ctx.currentTime + 1.8);
-                osc2.stop(ctx.currentTime + 1.8);
-                osc3.stop(ctx.currentTime + 1.8);
-            } catch(e) {
-                console.error("Audio buzzer error:", e);
+            if (isReady) {
+                audioUnlocked = true;
+                badge.className = 'audio-status-badge unlocked';
+                text.textContent = 'Horn Sound Ready';
+            } else {
+                badge.className = 'audio-status-badge prompt';
+                text.textContent = 'Click to enable Horn Sound';
             }
         }
 
-        // Unlock AudioContext automatically on user interaction
-        function unlockAudio() {
-            getAudioContext();
+        function unlockAudio(playTest = false) {
+            const ctx = getAudioContext();
+            if (ctx) {
+                ctx.resume().then(() => {
+                    updateAudioBadge(true);
+                    if (playTest) {
+                        playBuzzerSound();
+                    }
+                }).catch(err => {
+                    console.error("Audio resume error:", err);
+                });
+            }
         }
-        window.addEventListener('click', unlockAudio, { once: true });
-        window.addEventListener('keydown', unlockAudio, { once: true });
+
+        ['click', 'keydown', 'mousedown', 'touchstart', 'pointerdown'].forEach(evt => {
+            window.addEventListener(evt, () => unlockAudio(false), { passive: true });
+        });
+
+        // Powerful 5-harmonic sharp stadium arena horn buzzer
+        function playBuzzerSound() {
+            const nowTime = Date.now();
+            if (nowTime - lastBuzzerPlayTime < 800) return;
+            lastBuzzerPlayTime = nowTime;
+
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                if (ctx.state === 'suspended') {
+                    ctx.resume().catch(() => {});
+                }
+
+                const now = ctx.currentTime;
+                const duration = 1.4;
+
+                const masterGain = ctx.createGain();
+                masterGain.gain.setValueAtTime(0.9, now);
+                masterGain.gain.setValueAtTime(0.9, now + duration - 0.15);
+                masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+                const lowpass = ctx.createBiquadFilter();
+                lowpass.type = 'lowpass';
+                lowpass.frequency.setValueAtTime(4500, now);
+
+                const highShelf = ctx.createBiquadFilter();
+                highShelf.type = 'highshelf';
+                highShelf.frequency.setValueAtTime(1800, now);
+                highShelf.gain.setValueAtTime(8.0, now);
+
+                const frequencies = [220, 330, 440, 660, 880];
+                const gains = [0.4, 0.35, 0.3, 0.25, 0.2];
+
+                frequencies.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(freq, now);
+                    osc.detune.setValueAtTime((idx % 2 === 0 ? 1 : -1) * 12, now);
+
+                    gain.gain.setValueAtTime(gains[idx], now);
+                    osc.connect(gain);
+                    gain.connect(lowpass);
+
+                    osc.start(now);
+                    osc.stop(now + duration);
+                });
+
+                lowpass.connect(highShelf);
+                highShelf.connect(masterGain);
+                masterGain.connect(ctx.destination);
+                updateAudioBadge(true);
+            } catch(e) {
+                console.error("Display buzzer sound error:", e);
+            }
+        }
 
         function formatScore(val) {
             const num = Number(val) || 0;
@@ -554,6 +685,7 @@
         }
 
         let previousShotSeconds = null;
+        let previousGameSeconds = null;
 
         function renderScoreboard(state) {
             if (!state) return;
@@ -562,13 +694,23 @@
             const currentShotSec = state.shotSeconds ?? 24;
             const shotClockBox = document.getElementById('shotClockBox');
 
-            // Trigger Full Red Box styling when shot clock hits 0
+            // Trigger Full Red Box styling and buzzer sound when shot clock hits 0
             if (currentShotSec === 0) {
                 shotClockBox.classList.add('expired');
+                if (previousShotSeconds !== null && previousShotSeconds > 0) {
+                    playBuzzerSound();
+                }
             } else {
                 shotClockBox.classList.remove('expired');
             }
             previousShotSeconds = currentShotSec;
+
+            // Trigger buzzer sound when game clock hits 00:00
+            const currentGameSec = state.gameSeconds ?? 600;
+            if (currentGameSec === 0 && previousGameSeconds !== null && previousGameSeconds > 0) {
+                playBuzzerSound();
+            }
+            previousGameSeconds = currentGameSec;
 
             const isSwapped = !!state.swapSides;
 
@@ -659,6 +801,8 @@
         channel.onmessage = function(event) {
             if (event.data && event.data.type === 'STATE_UPDATE') {
                 renderScoreboard(event.data.state);
+            } else if (event.data && event.data.type === 'PLAY_BUZZER') {
+                playBuzzerSound();
             }
         };
 
@@ -676,6 +820,35 @@
             }
 
             channel.postMessage({ type: 'REQUEST_STATE' });
+        });
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const isFs = !!document.fullscreenElement;
+            const icon = document.getElementById('displayFsIcon');
+            const text = document.getElementById('displayFsText');
+            if (icon && text) {
+                icon.textContent = isFs ? '🗗' : '⛶';
+                text.textContent = isFs ? 'EXIT FULLSCREEN' : 'FULLSCREEN';
+            }
+        });
+
+        // Double-click background to toggle fullscreen
+        document.body.addEventListener('dblclick', (e) => {
+            if (e.target.tagName !== 'BUTTON' && !e.target.closest('#audioStatusBadge') && !e.target.closest('#displayFullscreenBtn')) {
+                toggleFullscreen();
+            }
         });
     </script>
 </body>
