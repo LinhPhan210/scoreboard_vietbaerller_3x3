@@ -239,40 +239,6 @@
             align-items: center;
             justify-content: center;
         }
-
-        .shot-clock-container-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            position: relative;
-        }
-
-        .shot-possession-arrow {
-            font-family: var(--font-digits);
-            font-size: clamp(2.4rem, 7vh, 5.5rem);
-            color: var(--color-unlit);
-            line-height: 1;
-            transition: all 0.2s ease;
-            user-select: none;
-            position: absolute;
-            z-index: 2;
-        }
-
-        .shot-possession-arrow.left {
-            left: 0.8vw;
-        }
-
-        .shot-possession-arrow.right {
-            right: 0.8vw;
-        }
-
-        .shot-possession-arrow.active {
-            color: var(--color-amber);
-            text-shadow: 0 0 22px var(--color-amber-glow), 0 0 10px rgba(255, 170, 0, 0.9);
-            transform: scale(1.12);
-        }
-
         /* FULL RED ALERT FLASH WHEN SHOT CLOCK REACHES 0 */
         .shot-clock-box.expired {
             background: #cc0000 !important;
@@ -534,11 +500,7 @@
 
                 <!-- BOTTOM BOX: SHOT CLOCK BOX (SLIGHTLY BIGGER) -->
                 <div class="shot-clock-box" id="shotClockBox">
-                    <div class="shot-clock-container-row">
-                        <span class="shot-possession-arrow left" id="leftShotPossArrow">&#9664;</span>
-                        <div class="shot-clock-digit" id="shotClock">24</div>
-                        <span class="shot-possession-arrow right" id="rightShotPossArrow">&#9654;</span>
-                    </div>
+                    <div class="shot-clock-digit" id="shotClock">24</div>
                 </div>
             </div>
 
@@ -769,30 +731,22 @@
             document.getElementById('periodDisplay').textContent = state.period ?? "1";
             document.getElementById('gameClock').textContent = formatMMSS(state.gameSeconds ?? 600);
 
-            // Possession Arrows (Header & Beside Shot Clock)
+            // Possession Arrows (Header)
             const leftPossession = isSwapped ? (state.possession === 'guest') : (state.possession === 'home');
             const rightPossession = isSwapped ? (state.possession === 'home') : (state.possession === 'guest');
 
             const homeArrow = document.getElementById('homeArrow');
             const guestArrow = document.getElementById('guestArrow');
-            const leftShotArrow = document.getElementById('leftShotPossArrow');
-            const rightShotArrow = document.getElementById('rightShotPossArrow');
 
             if (leftPossession) {
                 homeArrow.classList.add('active');
                 guestArrow.classList.remove('active');
-                if (leftShotArrow) leftShotArrow.classList.add('active');
-                if (rightShotArrow) rightShotArrow.classList.remove('active');
             } else if (rightPossession) {
                 guestArrow.classList.add('active');
                 homeArrow.classList.remove('active');
-                if (rightShotArrow) rightShotArrow.classList.add('active');
-                if (leftShotArrow) leftShotArrow.classList.remove('active');
             } else {
                 homeArrow.classList.remove('active');
                 guestArrow.classList.remove('active');
-                if (leftShotArrow) leftShotArrow.classList.remove('active');
-                if (rightShotArrow) rightShotArrow.classList.remove('active');
             }
 
             // Shot Clock Digits
